@@ -118,3 +118,460 @@ type Withdraw @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type ExecuteTransaction @entity(immutable: true) {
+  id: Bytes!
+  executor: Bytes! # address
+  nonce: BigInt! # uint256
+  result: Bytes! # bytes
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProposalMade @entity(immutable: true) {
+  id: Bytes!
+  proposer: Bytes! # address
+  to: Bytes! # address
+  data: Bytes! # bytes
+  nonce: BigInt! # uint256
+  transactionHash: Bytes! # bytes32
+  timeStamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type AriadneCreated @entity(immutable: true) {
+  id: Bytes!
+  contractId: BigInt! # uint256
+  name: String! # string
+  contractAddress: Bytes! # address
+  ammAddress: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AriadneMaxVotingPowerChanged @entity(immutable: true) {
+  id: Bytes!
+  ariadneDAO: Bytes! # address
+  maxVotingPower: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AriadneMinVotingPowerChanged @entity(immutable: true) {
+  id: Bytes!
+  ariadneDAO: Bytes! # address
+  minVotingPower: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AriadneVotesNeededPercentageChanged @entity(immutable: true) {
+  id: Bytes!
+  ariadneDAO: Bytes! # address
+  votesNeededPercentage: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AriadneVotingTimeChanged @entity(immutable: true) {
+  id: Bytes!
+  ariadneDAO: Bytes! # address
+  votingTime: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ExecutedTransaction @entity(immutable: true) {
+  id: Bytes!
+  ariadneDAO: Bytes! # address
+  executor: Bytes! # address
+  nonce: BigInt! # uint256
+  result: Bytes! # bytes
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type CreateAriadnesProposalMade @entity(immutable: true) {
+  id: Bytes!
+  ariadneDAO: Bytes! # address
+  proposer: Bytes! # address
+  to: Bytes! # address
+  data: Bytes! # bytes
+  nonce: BigInt! # uint256
+  transactionHash: Bytes! # bytes32
+  timeStamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type AddAmm @entity(immutable: true) {
+  id: Bytes!
+  ammAddr: Bytes! # address
+  name: String! # string
+  symbol: String! # string
+  payload: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AmmClosePosition @entity(immutable: true) {
+  id: Bytes!
+  ammAddr: Bytes! # address
+  amount: BigInt! # int256
+  timestamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AmmOpenPosition @entity(immutable: true) {
+  id: Bytes!
+  ammAddr: Bytes! # address
+  amount: BigInt! # int256
+  timestamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Freeze @entity(immutable: true) {
+  id: Bytes!
+  amm: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewSnappshot @entity(immutable: true) {
+  id: Bytes!
+  amm: Bytes! # address
+  newIndex: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PriceChange @entity(immutable: true) {
+  id: Bytes!
+  amm: Bytes! # address
+  currentIndex: BigInt! # uint256
+  indexPrice: BigInt! # uint256
+  baseAsset: BigInt! # uint256
+  quoteAsset: BigInt! # uint256
+  ffr: BigInt! # int256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RemoveAmm @entity(immutable: true) {
+  id: Bytes!
+  ammAddr: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UnFreeze @entity(immutable: true) {
+  id: Bytes!
+  amm: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type AddDebt @entity(immutable: true) {
+  id: Bytes!
+  amm: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type BorrowAmount @entity(immutable: true) {
+  id: Bytes!
+  tradeId: Bytes! # bytes
+  amm: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type InterestPeriodsSet @entity(immutable: true) {
+  id: Bytes!
+  _interestPeriods: BigInt! # uint256
+  _ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LoanInterestRateSet @entity(immutable: true) {
+  id: Bytes!
+  _loanInterestRate: BigInt! # uint256
+  _ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LoanPoolInitialized @entity(immutable: true) {
+  id: Bytes!
+  _ammPool: Bytes! # address
+  _dao: Bytes! # address
+  timeStamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LoanPoolValues @entity(immutable: true) {
+  id: Bytes!
+  ammPool: Bytes! # address
+  minLoan: BigInt! # uint256
+  maxLoan: BigInt! # uint256
+  loanInterestRate: BigInt! # uint256
+  loanInterestPeriod: BigInt! # uint256
+  mmr: BigInt! # uint256
+  minHoldingsReqPercentage: BigInt! # uint256
+  tradingFee: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MMRSet @entity(immutable: true) {
+  id: Bytes!
+  _mmr: BigInt! # uint256
+  _ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MaxLoanSet @entity(immutable: true) {
+  id: Bytes!
+  _maxLoan: BigInt! # uint256
+  _ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinAndMaxHoldingsReqPercentageSet @entity(immutable: true) {
+  id: Bytes!
+  _minHoldingsReqPercentage: BigInt! # uint256
+  _maxHoldingsReqPercentage: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinAndMaxInterestPeriodsSet @entity(immutable: true) {
+  id: Bytes!
+  _minInterestPeriods: BigInt! # uint256
+  _maxInterestPeriods: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinAndMaxInterestRateSet @entity(immutable: true) {
+  id: Bytes!
+  _minInterestRate: BigInt! # uint256
+  _maxInterestRate: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinAndMaxLoanSet @entity(immutable: true) {
+  id: Bytes!
+  _minLoan: BigInt! # uint256
+  _maxLoan: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinAndMaxMMRSet @entity(immutable: true) {
+  id: Bytes!
+  _minMMR: BigInt! # uint256
+  _maxMMR: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinAndMaxTradingFeeSet @entity(immutable: true) {
+  id: Bytes!
+  _minTradingFee: BigInt! # uint256
+  _maxTradingFee: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinHoldingsReqPercentageSet @entity(immutable: true) {
+  id: Bytes!
+  _minHoldingsReqPercentage: BigInt! # uint256
+  _ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinLoanSet @entity(immutable: true) {
+  id: Bytes!
+  _minLoan: BigInt! # uint256
+  _ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PayDebt @entity(immutable: true) {
+  id: Bytes!
+  amm: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LoanPoolPayInterest @entity(immutable: true) {
+  id: Bytes!
+  tradeId: Bytes! # bytes
+  lastPayed: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RepayLoan @entity(immutable: true) {
+  id: Bytes!
+  tradeId: Bytes! # bytes
+  amm: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TradingFeeSet @entity(immutable: true) {
+  id: Bytes!
+  _tradingFee: BigInt! # uint256
+  _ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type AddTokenToPool @entity(immutable: true) {
+  id: Bytes!
+  ammPool: Bytes! # address
+  tokenId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FrozenStake @entity(immutable: true) {
+  id: Bytes!
+  ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Stake @entity(immutable: true) {
+  id: Bytes!
+  user: Bytes! # address
+  usdcAmount: BigInt! # uint256
+  tokenId: BigInt! # uint256
+  ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UnFrozenStake @entity(immutable: true) {
+  id: Bytes!
+  ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Unstake @entity(immutable: true) {
+  id: Bytes!
+  user: Bytes! # address
+  usdcAmount: BigInt! # uint256
+  tokenId: BigInt! # uint256
+  ammPool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type User @entity {
+  id: Bytes!
+  address: Bytes! # address!
+  balances: [Balance!]! # Balance[]
+  stakes: [Stake!]! # Stake[]
+  trades: [Trade!]! # Trade[]
+}
+type Trades @entity{
+  id:Bytes!
+  user: Bytes! # address!
+  ammPool: Bytes! # address!
+  tradeBalances: [TradeBalance!]! # TradeBalance[]
+  created: BigInt! # uint256
+  LastInterestPayed: BigInt! # uint256
+  LastFFRPayed: BigInt! # uint256
+   collateral: BigInt! # uint256
+  loanAmt: BigInt! # uint256
+  positionSize: BigInt! # int256
+  entryPrice: BigInt! # uint256
+  exitPrice: BigInt! # uint256
+  exitTime: BigInt! # uint256 
+}
+type AmmPool @entity{
+  id:Bytes!
+  amm: Bytes! # address!
+  interestPercentage: BigInt! # uint256
+  interestPeriod: BigInt! # uint256
+  minLoan: BigInt! # uint256
+  maxLoan: BigInt! # uint256
+  mmr: BigInt! # uint256
+  tradingFee: BigInt! # uint256
+  balances: [Balance!]! # Balance[]
+  stakes: [Stake!]! # Stake[]
+  trades: [Trade!]! # Trade[]
+  dao: [Dao!]! # Dao[]
+  debt: [Debt!]! # Debt[]
+}
+type AriadneDAO @entity{
+  id:Bytes!
+  ammPool: Bytes! # address!
+  balances: [Balance!]! # Balance[]
+  stakes: [Stake!]! # Stake[]
+  trades: [Trade!]! # Trade[]
+  
+  debt: [Debt!]! # Debt[]
+  stakes: [Stake!]! # Stake[]
+  proposals: [Proposal!]! # Proposal[]
+  maxTradingFee: BigInt! # uint256
+  minTradingFee: BigInt! # uint256
+  poolTokens: [PoolToken!]! # PoolToken[]
+
+}

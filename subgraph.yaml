@@ -55,3 +55,216 @@ dataSources:
         - event: Withdraw(indexed address,uint256)
           handler: handleWithdraw
       file: ./src/exchange.ts
+  - kind: ethereum
+    name: TheseusDAO
+    network: goerli
+    source:
+      address: "0xc4b9f4e8d1ccbc5fad290840ee8f5fc96479a7d5"
+      abi: TheseusDAO
+      startBlock: 9016750
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ExecuteTransaction
+        - ProposalMade
+      abis:
+        - name: TheseusDAO
+          file: ./abis/TheseusDAO.json
+      eventHandlers:
+        - event: ExecuteTransaction(indexed address,uint256,bytes)
+          handler: handleExecuteTransaction
+        - event: ProposalMade(indexed address,indexed address,bytes,uint256,bytes32,uint256)
+          handler: handleProposalMade
+      file: ./src/theseus-dao.ts
+  - kind: ethereum
+    name: CreateAriadnes
+    network: goerli
+    source:
+      address: "0xeA0b45d79DfFf9D0eA96d549d5247700dEa7e149"
+      abi: CreateAriadnes
+      startBlock: 9016753
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AriadneCreated
+        - AriadneMaxVotingPowerChanged
+        - AriadneMinVotingPowerChanged
+        - AriadneVotesNeededPercentageChanged
+        - AriadneVotingTimeChanged
+        - ExecutedTransaction
+        - CreateAriadnesProposalMade
+      abis:
+        - name: CreateAriadnes
+          file: ./abis/CreateAriadnes.json
+      eventHandlers:
+        - event: AriadneCreated(indexed uint256,string,indexed address,indexed address)
+          handler: handleAriadneCreated
+        - event: AriadneMaxVotingPowerChanged(indexed address,indexed uint256)
+          handler: handleAriadneMaxVotingPowerChanged
+        - event: AriadneMinVotingPowerChanged(indexed address,indexed uint256)
+          handler: handleAriadneMinVotingPowerChanged
+        - event: AriadneVotesNeededPercentageChanged(indexed address,indexed uint256)
+          handler: handleAriadneVotesNeededPercentageChanged
+        - event: AriadneVotingTimeChanged(indexed address,indexed uint256)
+          handler: handleAriadneVotingTimeChanged
+        - event: ExecutedTransaction(indexed address,indexed address,uint256,bytes)
+          handler: handleExecutedTransaction
+        - event: ProposalMade(indexed address,indexed address,indexed
+            address,bytes,uint256,bytes32,uint256)
+          handler: handleProposalMade
+      file: ./src/create-ariadnes.ts
+  - kind: ethereum
+    name: AmmViewer
+    network: goerli
+    source:
+      address: "0x0c2BacF2DB04a25EA5DEF92aB115Ba5770Be3f6E"
+      abi: AmmViewer
+      startBlock: 9016760
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AddAmm
+        - AmmClosePosition
+        - AmmOpenPosition
+        - Freeze
+        - NewSnappshot
+        - PriceChange
+        - RemoveAmm
+        - UnFreeze
+      abis:
+        - name: AmmViewer
+          file: ./abis/AmmViewer.json
+      eventHandlers:
+        - event: AddAmm(address,string,string,bytes32)
+          handler: handleAddAmm
+        - event: AmmClosePosition(address,int256,uint256)
+          handler: handleAmmClosePosition
+        - event: AmmOpenPosition(address,int256,uint256)
+          handler: handleAmmOpenPosition
+        - event: Freeze(address)
+          handler: handleFreeze
+        - event: NewSnappshot(address,uint256)
+          handler: handleNewSnappshot
+        - event: PriceChange(address,uint256,uint256,uint256,uint256,int256)
+          handler: handlePriceChange
+        - event: RemoveAmm(address)
+          handler: handleRemoveAmm
+        - event: UnFreeze(address)
+          handler: handleUnFreeze
+      file: ./src/amm-viewer.ts
+  - kind: ethereum
+    name: LoanPool
+    network: goerli
+    source:
+      address: "0x31a6314fE6a87EA0F98969765753f7e6573963CF"
+      abi: LoanPool
+      startBlock: 9016755
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AddDebt
+        - BorrowAmount
+        - InterestPeriodsSet
+        - LoanInterestRateSet
+        - LoanPoolInitialized
+        - LoanPoolValues
+        - MMRSet
+        - MaxLoanSet
+        - MinAndMaxHoldingsReqPercentageSet
+        - MinAndMaxInterestPeriodsSet
+        - MinAndMaxInterestRateSet
+        - MinAndMaxLoanSet
+        - MinAndMaxMMRSet
+        - MinAndMaxTradingFeeSet
+        - MinHoldingsReqPercentageSet
+        - MinLoanSet
+        - PayDebt
+        - LoanPoolPayInterest
+        - RepayLoan
+        - TradingFeeSet
+      abis:
+        - name: LoanPool
+          file: ./abis/LoanPool.json
+      eventHandlers:
+        - event: AddDebt(indexed address,uint256)
+          handler: handleAddDebt
+        - event: BorrowAmount(bytes,indexed address,uint256)
+          handler: handleBorrowAmount
+        - event: InterestPeriodsSet(uint256,indexed address)
+          handler: handleInterestPeriodsSet
+        - event: LoanInterestRateSet(uint256,indexed address)
+          handler: handleLoanInterestRateSet
+        - event: LoanPoolInitialized(indexed address,indexed address,uint256)
+          handler: handleLoanPoolInitialized
+        - event: LoanPoolValues(indexed
+            address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleLoanPoolValues
+        - event: MMRSet(uint256,indexed address)
+          handler: handleMMRSet
+        - event: MaxLoanSet(uint256,indexed address)
+          handler: handleMaxLoanSet
+        - event: MinAndMaxHoldingsReqPercentageSet(uint256,uint256)
+          handler: handleMinAndMaxHoldingsReqPercentageSet
+        - event: MinAndMaxInterestPeriodsSet(uint256,uint256)
+          handler: handleMinAndMaxInterestPeriodsSet
+        - event: MinAndMaxInterestRateSet(uint256,uint256)
+          handler: handleMinAndMaxInterestRateSet
+        - event: MinAndMaxLoanSet(uint256,uint256)
+          handler: handleMinAndMaxLoanSet
+        - event: MinAndMaxMMRSet(uint256,uint256)
+          handler: handleMinAndMaxMMRSet
+        - event: MinAndMaxTradingFeeSet(uint256,uint256)
+          handler: handleMinAndMaxTradingFeeSet
+        - event: MinHoldingsReqPercentageSet(uint256,indexed address)
+          handler: handleMinHoldingsReqPercentageSet
+        - event: MinLoanSet(uint256,indexed address)
+          handler: handleMinLoanSet
+        - event: PayDebt(indexed address,uint256)
+          handler: handlePayDebt
+        - event: PayInterest(bytes,uint256)
+          handler: handlePayInterest
+        - event: RepayLoan(bytes,indexed address,uint256)
+          handler: handleRepayLoan
+        - event: TradingFeeSet(uint256,indexed address)
+          handler: handleTradingFeeSet
+      file: ./src/loan-pool.ts
+  - kind: ethereum
+    name: Staking
+    network: goerli
+    source:
+      address: "0x37f5CEC042b1E78E8a60cDF5A11867108Ae0b17c"
+      abi: Staking
+      startBlock: 9016751
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AddTokenToPool
+        - FrozenStake
+        - Stake
+        - UnFrozenStake
+        - Unstake
+      abis:
+        - name: Staking
+          file: ./abis/Staking.json
+      eventHandlers:
+        - event: AddTokenToPool(address,uint256)
+          handler: handleAddTokenToPool
+        - event: FrozenStake(address)
+          handler: handleFrozenStake
+        - event: Stake(address,uint256,uint256,address)
+          handler: handleStake
+        - event: UnFrozenStake(address)
+          handler: handleUnFrozenStake
+        - event: Unstake(address,uint256,uint256,address)
+          handler: handleUnstake
+      file: ./src/staking.ts
