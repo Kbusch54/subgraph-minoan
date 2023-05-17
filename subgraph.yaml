@@ -1,0 +1,57 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Exchange
+    network: goerli
+    source:
+      address: "0xd98387fC0Dcdf7FF2DF0E252B0E351f608Aad48A"
+      abi: Exchange
+      startBlock: 9016915
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AddCollateral
+        - AddLiquidity
+        - ClosePosition
+        - Deposit
+        - FfrAdjust
+        - Liquidated
+        - NewPosition
+        - OpenPosition
+        - PayInterest
+        - RemoveCollateral
+        - RemoveLiquidity
+        - Withdraw
+      abis:
+        - name: Exchange
+          file: ./abis/Exchange.json
+      eventHandlers:
+        - event: AddCollateral(bytes,uint256)
+          handler: handleAddCollateral
+        - event: AddLiquidity(indexed bytes,uint256,uint256,int256)
+          handler: handleAddLiquidity
+        - event: ClosePosition(indexed bytes,uint256,uint256,int256)
+          handler: handleClosePosition
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+        - event: FfrAdjust(bytes,int256)
+          handler: handleFfrAdjust
+        - event: Liquidated(indexed bytes)
+          handler: handleLiquidated
+        - event: NewPosition(indexed bytes,indexed address,indexed address,int256,uint256)
+          handler: handleNewPosition
+        - event: OpenPosition(indexed bytes,uint256,uint256,int256,uint256,uint256)
+          handler: handleOpenPosition
+        - event: PayInterest(bytes,uint256,uint256)
+          handler: handlePayInterest
+        - event: RemoveCollateral(bytes,uint256)
+          handler: handleRemoveCollateral
+        - event: RemoveLiquidity(indexed bytes,int256,int256,int256)
+          handler: handleRemoveLiquidity
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
+      file: ./src/exchange.ts

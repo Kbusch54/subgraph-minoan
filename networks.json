@@ -1,0 +1,8 @@
+{
+  "goerli": {
+    "Exchange": {
+      "address": "0xd98387fC0Dcdf7FF2DF0E252B0E351f608Aad48A",
+      "startBlock": 9016915
+    }
+  }
+}
