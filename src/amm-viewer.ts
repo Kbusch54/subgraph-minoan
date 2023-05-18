@@ -9,14 +9,8 @@ import {
   UnFreeze as UnFreezeEvent
 } from "../generated/AmmViewer/AmmViewer"
 import {
-  AddAmm,
-  AmmClosePosition,
-  AmmOpenPosition,
-  Freeze,
-  NewSnappshot,
-  PriceChange,
-  RemoveAmm,
-  UnFreeze
+ AriadneDAO,
+ Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
 } from "../generated/schema"
 
 export function handleAddAmm(event: AddAmmEvent): void {
@@ -36,9 +30,11 @@ export function handleAddAmm(event: AddAmmEvent): void {
 }
 
 export function handleAmmClosePosition(event: AmmClosePositionEvent): void {
-  let entity = new AmmClosePosition(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
+  let id = event.params.ammAddr
+  let entity = VAmm.load(id)
+  if (entity == null) {
+    entity = new VAmm(id)
+  }
   entity.ammAddr = event.params.ammAddr
   entity.amount = event.params.amount
   entity.timestamp = event.params.timestamp
@@ -51,10 +47,13 @@ export function handleAmmClosePosition(event: AmmClosePositionEvent): void {
 }
 
 export function handleAmmOpenPosition(event: AmmOpenPositionEvent): void {
-  let entity = new AmmOpenPosition(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ammAddr = event.params.ammAddr
+  
+  let id = event.params.ammAddr
+  let entity = VAmm.load(id)
+  if (entity == null) {
+    entity = new VAmm(id)
+  }
+  entity. = event.params.ammAddr
   entity.amount = event.params.amount
   entity.timestamp = event.params.timestamp
 

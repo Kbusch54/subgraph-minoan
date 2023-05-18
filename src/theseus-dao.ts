@@ -2,7 +2,10 @@ import {
   ExecuteTransaction as ExecuteTransactionEvent,
   ProposalMade as ProposalMadeEvent
 } from "../generated/TheseusDAO/TheseusDAO"
-import { ExecuteTransaction, ProposalMade } from "../generated/schema"
+import {
+  AriadneDAO,
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
+ } from "../generated/schema"
 
 export function handleExecuteTransaction(event: ExecuteTransactionEvent): void {
   let entity = new ExecuteTransaction(
