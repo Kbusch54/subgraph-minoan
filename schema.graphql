@@ -16,7 +16,6 @@ type Trade @entity{
   vamm: VAmm! # address!
   tradeBalance: TradeBalance!# TradeBalance
   created: BigInt! # uint256
-  interestRate: BigInt! # uint256
   isActive: Boolean! # bool
 }
 
@@ -25,31 +24,32 @@ type TradeBalance @entity{
   tradeId: Trade! # bytes!
   LastInterestPayed: BigInt! # uint256
   LastFFRPayed: BigInt! # uint256
+  interestRate: BigInt! # uint256
   side: BigInt! # uint256
   collateral: BigInt! # uint256
   leverage: BigInt! # uint256
   loanAmt: BigInt! # uint256
   positionSize: BigInt! # int256
   entryPrice: BigInt! # uint256
-  exitPrice: BigInt! # uint256
-  exitTime: BigInt! # uint256 
-  pnl: BigInt! # int256
+  exitPrice: BigInt # uint256
+  exitTime: BigInt # uint256 
+  pnl: BigInt # int256
 }
 type LoanPool @entity{
   id:Bytes!
   amm: VAmm! # address!
   ariadneDAO: AriadneDAO! # address!
   created: BigInt! # uint256
-  minLoan: BigInt # uint256
-  maxLoan: BigInt # uint256
-  interestRate: BigInt # uint256
-  interestPeriod: BigInt # uint256
-  mmr: BigInt # uint256
-  minHoldingsReqPercentage: BigInt # uint256
-  tradingFee: BigInt # uint256
+  minLoan: BigInt! # uint256
+  maxLoan: BigInt! # uint256
+  interestRate: BigInt! # uint256
+  interestPeriod: BigInt! # uint256
+  mmr: BigInt! # uint256
+  minHoldingsReqPercentage: BigInt! # uint256
+  tradingFee: BigInt! # uint256
   poolBalance: PoolBalance # PoolBalance
   trades: [Trade!]@derivedFrom(field:"ammPool") # Trade[]
-  debt: Debt # Debt[]
+  debt: Debt # Debt
   loanPoolTheseus: LoanPoolTheseus # LoanPoolTheseus
 }
 type PoolBalance @entity{
@@ -60,7 +60,21 @@ type PoolBalance @entity{
   outstandingLoanUsdc: BigInt! # uint256
   loanPool: LoanPool! # LoanPool  
 }
-
+type TheseusDAO @entity{
+  id:Bytes!
+  stakes: [Stakes!]! # Stakes[]
+  proposals: [Proposal!]! # Proposal[]@derivedFrom(field: "theseusDAO")
+  poolTokens: [PoolToken!]! # PoolToken[]
+  currentId: BigInt! # uint256
+  votingTime: BigInt! # uint256
+  maxVotingPower: BigInt! # uint256
+  minVotingPower: BigInt! # uint256
+  tokenId: BigInt! # uint256
+  votesNeededPercentage: BigInt! # uint256
+  insuranceFund: BigInt! # uint256
+  insuranceFundMin: BigInt! # uint256
+  loanPoolTheseus: LoanPoolTheseus! # LoanPoolTheseus
+}
 type LoanPoolTheseus @entity{
   id:Bytes!
   minMMR: BigInt! # uint256
@@ -100,6 +114,7 @@ type Proposal @entity{
   value: BigInt! # uint256
   data: Bytes! # bytes!
   result: Bytes! # bytes!
+  executor: Bytes! # address!
   proposedAt: BigInt! # uint256
   transactionHash: Bytes! # bytes32
   isPassed: Boolean! # bool
@@ -180,24 +195,25 @@ type Balance @entity{
   totalCollateralUsdc: BigInt! # uint256
 }
 
-type TheseusDAO @entity{
-  id:Bytes!
-  stakes: [Stakes!]! # Stakes[]
-  proposals: [Proposal!]! # Proposal[]@derivedFrom(field: "theseusDAO")
-  poolTokens: [PoolToken!]! # PoolToken[]
-  currentId: BigInt! # uint256
-  votingTime: BigInt! # uint256
-  maxVotingPower: BigInt! # uint256
-  minVotingPower: BigInt! # uint256
-  tokenId: BigInt! # uint256
-  votesNeededPercentage: BigInt! # uint256
-  insuranceFund: BigInt! # uint256
-  insuranceFundMin: BigInt! # uint256
-  loanPoolTheseus: LoanPoolTheseus! # LoanPoolTheseus
-}
+
 
 type Debt @entity{
   id:Bytes!
   amountOwed: BigInt! # uint256
   loanPool: LoanPool! # LoanPool
 }
+
+
+type ProposalMade @entity(immutable: true) {
+  id: Bytes!
+  proposer: Bytes! # address
+  to: Bytes! # address
+  data: Bytes! # bytes
+  nonce: BigInt! # uint256
+  transactionHash: Bytes! # bytes32
+  timeStamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+

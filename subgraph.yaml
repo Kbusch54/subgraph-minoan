@@ -6,9 +6,9 @@ dataSources:
     name: Exchange
     network: goerli
     source:
-      address: "0xd98387fC0Dcdf7FF2DF0E252B0E351f608Aad48A"
+      address: "0xce30471cA2438e49409B2f07Ad7256f8f43A9302"
       abi: Exchange
-      startBlock: 9016915
+      startBlock: 9029015
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -56,35 +56,12 @@ dataSources:
           handler: handleWithdraw
       file: ./src/exchange.ts
   - kind: ethereum
-    name: TheseusDAO
-    network: goerli
-    source:
-      address: "0xc4b9f4e8d1ccbc5fad290840ee8f5fc96479a7d5"
-      abi: TheseusDAO
-      startBlock: 9016750
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - ExecuteTransaction
-        - ProposalMade
-      abis:
-        - name: TheseusDAO
-          file: ./abis/TheseusDAO.json
-      eventHandlers:
-        - event: ExecuteTransaction(indexed address,uint256,bytes)
-          handler: handleExecuteTransaction
-        - event: ProposalMade(indexed address,indexed address,bytes,uint256,bytes32,uint256)
-          handler: handleProposalMade
-      file: ./src/theseus-dao.ts
-  - kind: ethereum
     name: CreateAriadnes
     network: goerli
     source:
-      address: "0xeA0b45d79DfFf9D0eA96d549d5247700dEa7e149"
+      address: "0x65e939FC9982a97cc082AF28E7745AE57fA1Ddd5"
       abi: CreateAriadnes
-      startBlock: 9016753
+      startBlock: 9029015
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -121,9 +98,9 @@ dataSources:
     name: AmmViewer
     network: goerli
     source:
-      address: "0x0c2BacF2DB04a25EA5DEF92aB115Ba5770Be3f6E"
+      address: "0xe503841ca51216514d1638bE712a6a88A349bF4E"
       abi: AmmViewer
-      startBlock: 9016760
+      startBlock: 9029015
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -162,9 +139,9 @@ dataSources:
     name: LoanPool
     network: goerli
     source:
-      address: "0x31a6314fE6a87EA0F98969765753f7e6573963CF"
+      address: "0xc37E852B05500e0FB4312003c757b250BB5c1c32"
       abi: LoanPool
-      startBlock: 9016755
+      startBlock: 9029015
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -240,9 +217,9 @@ dataSources:
     name: Staking
     network: goerli
     source:
-      address: "0x37f5CEC042b1E78E8a60cDF5A11867108Ae0b17c"
+      address: "0xF5f8b38bFf710d3deFfBf40d776976104d11151b"
       abi: Staking
-      startBlock: 9016751
+      startBlock: 9029015
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -268,3 +245,41 @@ dataSources:
         - event: Unstake(address,uint256,uint256,address)
           handler: handleUnstake
       file: ./src/staking.ts
+  - kind: ethereum
+    name: TheseusDAO
+    network: goerli
+    source:
+      address: "0x77BC795BedA4DA1f45339DC85126a7fcb1F90671"
+      abi: TheseusDAO
+      startBlock: 9029016
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ExecuteTransaction
+        - InsuranceFundMinChanged
+        - MaxVotingPowerChanged
+        - MinVotingPowerChanged
+        - ProposalMade
+        - VotesNeededPercentageChanged
+        - VotingTimeChanged
+      abis:
+        - name: TheseusDAO
+          file: ./abis/TheseusDAO.json
+      eventHandlers:
+        - event: ExecuteTransaction(indexed address,uint256,bytes)
+          handler: handleExecuteTransaction
+        - event: InsuranceFundMinChanged(uint256)
+          handler: handleInsuranceFundMinChanged
+        - event: MaxVotingPowerChanged(uint256)
+          handler: handleMaxVotingPowerChanged
+        - event: MinVotingPowerChanged(uint256)
+          handler: handleMinVotingPowerChanged
+        - event: ProposalMade(indexed address,indexed address,bytes,uint256,bytes32,uint256)
+          handler: handleProposalMade
+        - event: VotesNeededPercentageChanged(uint256)
+          handler: handleVotesNeededPercentageChanged
+        - event: VotingTimeChanged(uint256)
+          handler: handleVotingTimeChanged
+      file: ./src/theseus-dao.ts

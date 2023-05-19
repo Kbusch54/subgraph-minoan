@@ -6,12 +6,10 @@ import {
   Unstake as UnstakeEvent
 } from "../generated/Staking/Staking"
 import {
-  AddTokenToPool,
-  FrozenStake,
-  Stake,
-  UnFrozenStake,
-  Unstake
-} from "../generated/schema"
+  AriadneDAO,PriceData,
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,
+  Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
+ } from "../generated/schema"
 
 export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
   let entity = new AddTokenToPool(

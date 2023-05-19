@@ -88,14 +88,15 @@ export function handleAriadneVotingTimeChanged(
 export function handleExecutedTransaction(
   event: ExecutedTransactionEvent
 ): void {
-  let id = event.params.ariadneDAO
-  let entity = AriadneDAO.load(id)
-  if (entity == null) {
-    entity = new AriadneDAO(id)
+
+  let proposal = Proposal.load(event.params.ariadneDAO.toString().concat('-').concat(event.params.nonce.toString()))
+  if(proposal == null){
+    proposal = new Proposal(event.params.ariadneDAO.toString().concat('-').concat(event.params.nonce.toString()))
   }
-
-
-  entity.save()
+  proposal.isPassed = true
+  proposal.result = event.params.result
+  proposal.executor = event.params.executor
+  proposal.save()
 }
 
 export function handleProposalMade(event: ProposalMadeEvent): void {
@@ -114,6 +115,7 @@ export function handleProposalMade(event: ProposalMadeEvent): void {
   proposal.isPassed = false
   proposal.proposedAt = event.block.timestamp
   proposal.data = event.params.data
+  proposal.value = BigInt.fromI32(0)
 
   ariadne.currentId = event.params.nonce.plus(BigInt.fromI32(1))
   proposal.save()

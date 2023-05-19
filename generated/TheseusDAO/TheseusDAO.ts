@@ -36,6 +36,60 @@ export class ExecuteTransaction__Params {
   }
 }
 
+export class InsuranceFundMinChanged extends ethereum.Event {
+  get params(): InsuranceFundMinChanged__Params {
+    return new InsuranceFundMinChanged__Params(this);
+  }
+}
+
+export class InsuranceFundMinChanged__Params {
+  _event: InsuranceFundMinChanged;
+
+  constructor(event: InsuranceFundMinChanged) {
+    this._event = event;
+  }
+
+  get newInsuranceFundMin(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
+export class MaxVotingPowerChanged extends ethereum.Event {
+  get params(): MaxVotingPowerChanged__Params {
+    return new MaxVotingPowerChanged__Params(this);
+  }
+}
+
+export class MaxVotingPowerChanged__Params {
+  _event: MaxVotingPowerChanged;
+
+  constructor(event: MaxVotingPowerChanged) {
+    this._event = event;
+  }
+
+  get newMaxVotingPower(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
+export class MinVotingPowerChanged extends ethereum.Event {
+  get params(): MinVotingPowerChanged__Params {
+    return new MinVotingPowerChanged__Params(this);
+  }
+}
+
+export class MinVotingPowerChanged__Params {
+  _event: MinVotingPowerChanged;
+
+  constructor(event: MinVotingPowerChanged) {
+    this._event = event;
+  }
+
+  get newMinVotingPower(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
 export class ProposalMade extends ethereum.Event {
   get params(): ProposalMade__Params {
     return new ProposalMade__Params(this);
@@ -71,6 +125,42 @@ export class ProposalMade__Params {
 
   get timeStamp(): BigInt {
     return this._event.parameters[5].value.toBigInt();
+  }
+}
+
+export class VotesNeededPercentageChanged extends ethereum.Event {
+  get params(): VotesNeededPercentageChanged__Params {
+    return new VotesNeededPercentageChanged__Params(this);
+  }
+}
+
+export class VotesNeededPercentageChanged__Params {
+  _event: VotesNeededPercentageChanged;
+
+  constructor(event: VotesNeededPercentageChanged) {
+    this._event = event;
+  }
+
+  get newVotesNeededPercentage(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
+export class VotingTimeChanged extends ethereum.Event {
+  get params(): VotingTimeChanged__Params {
+    return new VotingTimeChanged__Params(this);
+  }
+}
+
+export class VotingTimeChanged__Params {
+  _event: VotingTimeChanged;
+
+  constructor(event: VotingTimeChanged) {
+    this._event = event;
+  }
+
+  get newVotingTime(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
   }
 }
 
@@ -359,6 +449,44 @@ export class TheseusDAO extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  maxVotingPower(): BigInt {
+    let result = super.call("maxVotingPower", "maxVotingPower():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_maxVotingPower(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "maxVotingPower",
+      "maxVotingPower():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  minVotingPower(): BigInt {
+    let result = super.call("minVotingPower", "minVotingPower():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_minVotingPower(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "minVotingPower",
+      "minVotingPower():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   nonceUsed(param0: BigInt): boolean {
@@ -833,6 +961,96 @@ export class UpdateExchangeCall__Outputs {
   }
 }
 
+export class UpdateInsuranceFundMinCall extends ethereum.Call {
+  get inputs(): UpdateInsuranceFundMinCall__Inputs {
+    return new UpdateInsuranceFundMinCall__Inputs(this);
+  }
+
+  get outputs(): UpdateInsuranceFundMinCall__Outputs {
+    return new UpdateInsuranceFundMinCall__Outputs(this);
+  }
+}
+
+export class UpdateInsuranceFundMinCall__Inputs {
+  _call: UpdateInsuranceFundMinCall;
+
+  constructor(call: UpdateInsuranceFundMinCall) {
+    this._call = call;
+  }
+
+  get newInsuranceFundMin(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class UpdateInsuranceFundMinCall__Outputs {
+  _call: UpdateInsuranceFundMinCall;
+
+  constructor(call: UpdateInsuranceFundMinCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateMaxVotingPowerCall extends ethereum.Call {
+  get inputs(): UpdateMaxVotingPowerCall__Inputs {
+    return new UpdateMaxVotingPowerCall__Inputs(this);
+  }
+
+  get outputs(): UpdateMaxVotingPowerCall__Outputs {
+    return new UpdateMaxVotingPowerCall__Outputs(this);
+  }
+}
+
+export class UpdateMaxVotingPowerCall__Inputs {
+  _call: UpdateMaxVotingPowerCall;
+
+  constructor(call: UpdateMaxVotingPowerCall) {
+    this._call = call;
+  }
+
+  get newmaxVotingPower(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class UpdateMaxVotingPowerCall__Outputs {
+  _call: UpdateMaxVotingPowerCall;
+
+  constructor(call: UpdateMaxVotingPowerCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateMinVotingPowerCall extends ethereum.Call {
+  get inputs(): UpdateMinVotingPowerCall__Inputs {
+    return new UpdateMinVotingPowerCall__Inputs(this);
+  }
+
+  get outputs(): UpdateMinVotingPowerCall__Outputs {
+    return new UpdateMinVotingPowerCall__Outputs(this);
+  }
+}
+
+export class UpdateMinVotingPowerCall__Inputs {
+  _call: UpdateMinVotingPowerCall;
+
+  constructor(call: UpdateMinVotingPowerCall) {
+    this._call = call;
+  }
+
+  get newMinVotingPower(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class UpdateMinVotingPowerCall__Outputs {
+  _call: UpdateMinVotingPowerCall;
+
+  constructor(call: UpdateMinVotingPowerCall) {
+    this._call = call;
+  }
+}
+
 export class UpdatePoolTokensCall extends ethereum.Call {
   get inputs(): UpdatePoolTokensCall__Inputs {
     return new UpdatePoolTokensCall__Inputs(this);
@@ -919,6 +1137,36 @@ export class UpdateStakingCall__Outputs {
   _call: UpdateStakingCall;
 
   constructor(call: UpdateStakingCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateVotingTimeCall extends ethereum.Call {
+  get inputs(): UpdateVotingTimeCall__Inputs {
+    return new UpdateVotingTimeCall__Inputs(this);
+  }
+
+  get outputs(): UpdateVotingTimeCall__Outputs {
+    return new UpdateVotingTimeCall__Outputs(this);
+  }
+}
+
+export class UpdateVotingTimeCall__Inputs {
+  _call: UpdateVotingTimeCall;
+
+  constructor(call: UpdateVotingTimeCall) {
+    this._call = call;
+  }
+
+  get newVotingTime(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class UpdateVotingTimeCall__Outputs {
+  _call: UpdateVotingTimeCall;
+
+  constructor(call: UpdateVotingTimeCall) {
     this._call = call;
   }
 }

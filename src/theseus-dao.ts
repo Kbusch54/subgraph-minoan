@@ -1,41 +1,111 @@
+import { BigInt, bigInt } from "@graphprotocol/graph-ts"
 import {
   ExecuteTransaction as ExecuteTransactionEvent,
-  ProposalMade as ProposalMadeEvent
+  InsuranceFundMinChanged as InsuranceFundMinChangedEvent,
+  MaxVotingPowerChanged as MaxVotingPowerChangedEvent,
+  MinVotingPowerChanged as MinVotingPowerChangedEvent,
+  ProposalMade as ProposalMadeEvent,
+  VotesNeededPercentageChanged as VotesNeededPercentageChangedEvent,
+  VotingTimeChanged as VotingTimeChangedEvent, TheseusDAO as TheseusDAOContract
 } from "../generated/TheseusDAO/TheseusDAO"
 import {
-  AriadneDAO,
+  AriadneDAO,PriceData,
   Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
  } from "../generated/schema"
 
 export function handleExecuteTransaction(event: ExecuteTransactionEvent): void {
-  let entity = new ExecuteTransaction(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.executor = event.params.executor
-  entity.nonce = event.params.nonce
-  entity.result = event.params.result
+  let proposalId = event.address.toString().concat('-').concat(event.params.nonce.toString())
+  let proposal = Proposal.load(proposalId)
+  if (proposal == null) {
+    proposal = new Proposal(proposalId)
+  }
+  proposal.result = event.params.result
+  proposal.executor = event.params.executor
+  proposal.isPassed = true
+  proposal.save()
+}
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+export function handleInsuranceFundMinChanged(
+  event: InsuranceFundMinChangedEvent
+): void {
+  let theseus = TheseusDAO.load(event.address)
+  if (theseus == null) {
+    theseus = new TheseusDAO(event.address)
+  }
+  theseus.insuranceFundMin = event.params.newInsuranceFundMin
+  theseus.save()
+}
 
-  entity.save()
+export function handleMaxVotingPowerChanged(
+  event: MaxVotingPowerChangedEvent
+): void {
+  let theseus = TheseusDAO.load(event.address)
+  if (theseus == null) {
+    theseus = new TheseusDAO(event.address)
+  }
+  theseus.maxVotingPower = event.params.newMaxVotingPower
+  theseus.save()
+}
+
+export function handleMinVotingPowerChanged(
+  event: MinVotingPowerChangedEvent
+): void {
+  let theseus = TheseusDAO.load(event.address)
+  if (theseus == null) {
+    theseus = new TheseusDAO(event.address)
+  }
+  theseus.minVotingPower = event.params.newMinVotingPower
+  theseus.save()
 }
 
 export function handleProposalMade(event: ProposalMadeEvent): void {
-  let entity = new ProposalMade(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.proposer = event.params.proposer
-  entity.to = event.params.to
-  entity.data = event.params.data
-  entity.nonce = event.params.nonce
-  entity.transactionHash = event.params.transactionHash
-  entity.timeStamp = event.params.timeStamp
+  let id = event.address
+  let theseus = TheseusDAO.load(id)
+  if (theseus == null) {
+    theseus = new TheseusDAO(id)
+    theseus.currentId = BigInt.fromI32(0)
+    let conract = TheseusDAOContract.bind(event.address)
+    theseus.maxVotingPower = conract.maxVotingPower()
+    theseus.votesNeededPercentage = conract.votesNeededPercentage()
+    theseus.minVotingPower = conract.minVotingPower()
+    theseus.votingTime = conract.votingTime()
+    theseus.tokenId = BigInt.fromI32(0)
+    theseus.insuranceFundMin = conract.insuranceFundMin()
+    theseus.insuranceFund = BigInt.fromI32(0)
+  }
+  let proposeId = event.params.nonce
+  let proposal = new Proposal(event.address.toString().concat('-').concat(proposeId.toString()))
+  proposal.theseusDAO = event.address
+  proposal.nonce = event.params.nonce
+  proposal.proposer = event.params.proposer
+  proposal.to = event.params.to
+  proposal.transactionHash = event.params.transactionHash
+  proposal.isPassed = false
+  proposal.proposedAt = event.block.timestamp
+  proposal.data = event.params.data
+  proposal.value = BigInt.fromI32(0)
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+  theseus.currentId = event.params.nonce.plus(BigInt.fromI32(1))
+  proposal.save()
+  theseus.save()
+}
 
-  entity.save()
+export function handleVotesNeededPercentageChanged(
+  event: VotesNeededPercentageChangedEvent
+): void {
+  let theseus = TheseusDAO.load(event.address)
+  if (theseus == null) {
+    theseus = new TheseusDAO(event.address)
+  }
+  theseus.votesNeededPercentage = event.params.newVotesNeededPercentage
+  theseus.save()
+}
+
+export function handleVotingTimeChanged(event: VotingTimeChangedEvent): void {
+  let theseus = TheseusDAO.load(event.address)
+  if (theseus == null) {
+    theseus = new TheseusDAO(event.address)
+  }
+  theseus.votingTime = event.params.newVotingTime
+  theseus.save()
 }

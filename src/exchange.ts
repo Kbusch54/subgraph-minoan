@@ -1,3 +1,5 @@
+
+import { Address, BigInt,ByteArray,Bytes } from "@graphprotocol/graph-ts";
 import {
   AddCollateral as AddCollateralEvent,
   AddLiquidity as AddLiquidityEvent,
@@ -13,197 +15,174 @@ import {
   Withdraw as WithdrawEvent
 } from "../generated/Exchange/Exchange"
 import {
-  AddCollateral,
-  AddLiquidity,
-  ClosePosition,
-  Deposit,
-  FfrAdjust,
-  Liquidated,
-  NewPosition,
-  OpenPosition,
-  PayInterest,
-  RemoveCollateral,
-  RemoveLiquidity,
-  Withdraw
-} from "../generated/schema"
+  AriadneDAO,PriceData,
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
+ } from "../generated/schema"
 
 export function handleAddCollateral(event: AddCollateralEvent): void {
-  let entity = new AddCollateral(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.amount = event.params.amount
+  let tradeId= event.params.tradeId
+  let trade = Trade.load(tradeId)
+  if(trade != null){
+    let balance = Balance.load(trade.user)
+    let tradeBalance = TradeBalance.load(tradeId)
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+    if(balance != null && tradeBalance != null){
+      balance.availableUsdc = balance.availableUsdc.minus(event.params.amount)
+      balance.totalCollateralUsdc = balance.totalCollateralUsdc.plus(event.params.amount)
+      tradeBalance.collateral = tradeBalance.collateral.plus(event.params.amount)
+      balance.save()
+      tradeBalance.save()
+    }
+  }
 }
 
 export function handleAddLiquidity(event: AddLiquidityEvent): void {
-  let entity = new AddLiquidity(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.amount = event.params.amount
-  entity.newLoan = event.params.newLoan
-  entity.addiotionalPositionSize = event.params.addiotionalPositionSize
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //edit 
+  //user
+  //trade
+  //tradeBalance
+  //balance
 }
 
+  function decodeTradeId(tradeId: Bytes): [Address, Address, BigInt, BigInt] {
+    
+    let sender = Address.fromString(tradeId.slice(0, 20).toString());
+    let amm = Address.fromString(tradeId.slice(20, 40).toString());
+    let timestamp = BigInt.fromString(tradeId.slice(40, 72).toString());
+    let side = BigInt.fromString(tradeId.slice(72, 104).toString());
+  
+    return [sender, amm, timestamp, side];
+  }
+
 export function handleClosePosition(event: ClosePositionEvent): void {
-  let entity = new ClosePosition(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.closePrice = event.params.closePrice
-  entity.closeTime = event.params.closeTime
-  entity.pnl = event.params.pnl
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+ 
 }
 
 export function handleDeposit(event: DepositEvent): void {
-  let entity = new Deposit(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.user = event.params.user
-  entity.amount = event.params.amount
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  let user = User.load(event.params.user)
+  let balance = Balance.load(event.params.user)
+  if (user == null) {
+    user = new User(event.params.user)
+    user.save()
+  }
+  if(balance == null){
+    balance = new Balance(event.params.user)
+    balance.user = event.params.user
+    balance.availableUsdc = event.params.amount
+    balance.save()
+  }else{
+    balance.availableUsdc = balance.availableUsdc.plus(event.params.amount)
+    balance.save()
+  }
 }
 
 export function handleFfrAdjust(event: FfrAdjustEvent): void {
-  let entity = new FfrAdjust(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.amount = event.params.amount
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+ 
 }
 
 export function handleLiquidated(event: LiquidatedEvent): void {
-  let entity = new Liquidated(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
 }
 
 export function handleNewPosition(event: NewPositionEvent): void {
-  let entity = new NewPosition(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.trader = event.params.trader
-  entity.amm = event.params.amm
-  entity.side = event.params.side
-  entity.timeStamp = event.params.timeStamp
+  //events: tradId, Trader,amm,side,timestamp
+  let tradeId= event.params.tradeId
+  let trade = new Trade(tradeId)
+  trade.tradeId = event.params.tradeId
+  trade.vamm = event.params.amm
+  trade.user = event.params.trader
+  trade.created = event.params.timeStamp
+  trade.isActive = true
+  trade.ammPool = event.params.amm
+  trade.tradeBalance = tradeId
+  trade.save()
+  let tradeBalance = new TradeBalance(tradeId)
+  tradeBalance.tradeId = event.params.tradeId
+  tradeBalance.LastInterestPayed = event.params.timeStamp
+  tradeBalance.side = event.params.side
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  
+ 
+  
+  tradeBalance.save()
 }
 
 export function handleOpenPosition(event: OpenPositionEvent): void {
-  let entity = new OpenPosition(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.collateral = event.params.collateral
-  entity.loanAmt = event.params.loanAmt
-  entity.positionSize = event.params.positionSize
-  entity.entryPrice = event.params.entryPrice
-  entity.lastFundingRate = event.params.lastFundingRate
+  let tradeBalance = TradeBalance.load(event.params.tradeId)
+  if(tradeBalance != null){
+    tradeBalance.LastFFRPayed = event.params.lastFundingRate
+    tradeBalance.entryPrice = event.params.entryPrice
+    tradeBalance.loanAmt = event.params.loanAmt
+    tradeBalance.collateral = event.params.collateral
+    tradeBalance.leverage = event.params.loanAmt.div(event.params.collateral)
+    tradeBalance.positionSize = event.params.positionSize
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+    let trade = Trade.load(event.params.tradeId)
+    if(trade != null){
+      let lp = LoanPool.load(trade.ammPool)
+      if(lp != null){
+        const tradingFee = lp.tradingFee
+        const interestRate = lp.interestRate
+        tradeBalance.interestRate = interestRate
+        let balance = Balance.load(trade.user)
+        if(balance != null){
+          //loan * tradingFee / 10**6
+          const feeToPay = event.params.loanAmt.times(tradingFee).div(BigInt.fromI32(10).pow(6))
+          balance.availableUsdc = balance.availableUsdc.minus(feeToPay)
+          balance.availableUsdc = balance.availableUsdc.minus(event.params.collateral)
+          balance.totalCollateralUsdc = event.params.collateral
+          let poolBal = PoolBalance.load(trade.ammPool)
+          if(poolBal != null){
+            poolBal.availableUsdc = poolBal.availableUsdc.plus(feeToPay)
+            poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.plus(feeToPay)
+            poolBal.save()
+          }
+          balance.save()
+        }
+      }
+  
+      
+    }
+    tradeBalance.save()
 
-  entity.save()
+    
+  }
 }
 
 export function handlePayInterest(event: PayInterestEvent): void {
-  let entity = new PayInterest(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.totalAmount = event.params.totalAmount
-  entity.amountToPool = event.params.amountToPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //add to avaiblbe usdc loan pool
+  //add to totalusdc loanpool
+  //take from userbalances from totalCollateral
+  //take from tradeBalaces collateral
+  //add to theseus if neccasary
 }
 
 export function handleRemoveCollateral(event: RemoveCollateralEvent): void {
-  let entity = new RemoveCollateral(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.amount = event.params.amount
+  let tradeId= event.params.tradeId
+  let trade = Trade.load(tradeId)
+  if(trade != null){
+    let balance = Balance.load(trade.user)
+    let tradeBalance = TradeBalance.load(tradeId)
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+    if(balance != null && tradeBalance != null){
+      balance.availableUsdc = balance.availableUsdc.plus(event.params.amount)
+      balance.totalCollateralUsdc = balance.totalCollateralUsdc.minus(event.params.amount)
+      tradeBalance.collateral = tradeBalance.collateral.minus(event.params.amount)
+      balance.save()
+      tradeBalance.save()
+    }
+  }
 
-  entity.save()
 }
 
 export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
-  let entity = new RemoveLiquidity(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.positionSizeRemoved = event.params.positionSizeRemoved
-  entity.amountOwed = event.params.amountOwed
-  entity.usdcReturned = event.params.usdcReturned
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {
-  let entity = new Withdraw(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.user = event.params.user
-  entity.amount = event.params.amount
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  let balance = Balance.load(event.params.user)
+  if(balance !=null){
+    balance.availableUsdc = balance.availableUsdc.minus(event.params.amount)
+    balance.save()
+  }
 }

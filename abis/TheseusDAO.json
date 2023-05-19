@@ -66,6 +66,45 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newInsuranceFundMin",
+        "type": "uint256"
+      }
+    ],
+    "name": "InsuranceFundMinChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newMaxVotingPower",
+        "type": "uint256"
+      }
+    ],
+    "name": "MaxVotingPowerChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newMinVotingPower",
+        "type": "uint256"
+      }
+    ],
+    "name": "MinVotingPowerChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "proposer",
@@ -103,6 +142,32 @@
       }
     ],
     "name": "ProposalMade",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newVotesNeededPercentage",
+        "type": "uint256"
+      }
+    ],
+    "name": "VotesNeededPercentageChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newVotingTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "VotingTimeChanged",
     "type": "event"
   },
   {
@@ -211,6 +276,20 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "maxVotingPower",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minVotingPower",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       { "internalType": "address payable", "name": "to", "type": "address" },
       { "internalType": "bytes", "name": "data", "type": "bytes" }
@@ -283,6 +362,45 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "newInsuranceFundMin",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateInsuranceFundMin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "newmaxVotingPower",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateMaxVotingPower",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "newMinVotingPower",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateMinVotingPower",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [{ "internalType": "address", "name": "_pt", "type": "address" }],
     "name": "updatePoolTokens",
     "outputs": [],
@@ -307,6 +425,15 @@
       { "internalType": "address", "name": "_staking", "type": "address" }
     ],
     "name": "updateStaking",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "newVotingTime", "type": "uint256" }
+    ],
+    "name": "updateVotingTime",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
