@@ -1093,80 +1093,6 @@ export class AriadneDAO extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
-  get ammPool(): Bytes {
-    let value = this.get("ammPool");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set ammPool(value: Bytes) {
-    this.set("ammPool", Value.fromBytes(value));
-  }
-
-  get balances(): Array<Bytes> {
-    let value = this.get("balances");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
-  }
-
-  set balances(value: Array<Bytes>) {
-    this.set("balances", Value.fromBytesArray(value));
-  }
-
-  get proposals(): Array<Bytes> {
-    let value = this.get("proposals");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
-  }
-
-  get maxTradingFee(): BigInt {
-    let value = this.get("maxTradingFee");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set maxTradingFee(value: BigInt) {
-    this.set("maxTradingFee", Value.fromBigInt(value));
-  }
-
-  get minTradingFee(): BigInt {
-    let value = this.get("minTradingFee");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set minTradingFee(value: BigInt) {
-    this.set("minTradingFee", Value.fromBigInt(value));
-  }
-
-  get poolTokens(): Array<Bytes> {
-    let value = this.get("poolTokens");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
-  }
-
-  set poolTokens(value: Array<Bytes>) {
-    this.set("poolTokens", Value.fromBytesArray(value));
-  }
-
   get currentId(): BigInt {
     let value = this.get("currentId");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1178,6 +1104,19 @@ export class AriadneDAO extends Entity {
 
   set currentId(value: BigInt) {
     this.set("currentId", Value.fromBigInt(value));
+  }
+
+  get ammPool(): Bytes {
+    let value = this.get("ammPool");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set ammPool(value: Bytes) {
+    this.set("ammPool", Value.fromBytes(value));
   }
 
   get votingTime(): BigInt {
@@ -1219,6 +1158,19 @@ export class AriadneDAO extends Entity {
     this.set("minVotingPower", Value.fromBigInt(value));
   }
 
+  get votesNeededPercentage(): BigInt {
+    let value = this.get("votesNeededPercentage");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set votesNeededPercentage(value: BigInt) {
+    this.set("votesNeededPercentage", Value.fromBigInt(value));
+  }
+
   get tokenId(): BigInt {
     let value = this.get("tokenId");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1232,50 +1184,8 @@ export class AriadneDAO extends Entity {
     this.set("tokenId", Value.fromBigInt(value));
   }
 
-  get votesNeededPercentage(): BigInt {
-    let value = this.get("votesNeededPercentage");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set votesNeededPercentage(value: BigInt) {
-    this.set("votesNeededPercentage", Value.fromBigInt(value));
-  }
-}
-
-export class Proposal extends Entity {
-  constructor(id: Bytes) {
-    super();
-    this.set("id", Value.fromBytes(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id != null, "Cannot save Proposal entity without an ID");
-    if (id) {
-      assert(
-        id.kind == ValueKind.BYTES,
-        `Entities of type Proposal must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
-      );
-      store.set("Proposal", id.toBytes().toHexString(), this);
-    }
-  }
-
-  static loadInBlock(id: Bytes): Proposal | null {
-    return changetype<Proposal | null>(
-      store.get_in_block("Proposal", id.toHexString())
-    );
-  }
-
-  static load(id: Bytes): Proposal | null {
-    return changetype<Proposal | null>(store.get("Proposal", id.toHexString()));
-  }
-
-  get id(): Bytes {
-    let value = this.get("id");
+  get poolToken(): Bytes {
+    let value = this.get("poolToken");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -1283,8 +1193,70 @@ export class Proposal extends Entity {
     }
   }
 
-  set id(value: Bytes) {
-    this.set("id", Value.fromBytes(value));
+  set poolToken(value: Bytes) {
+    this.set("poolToken", Value.fromBytes(value));
+  }
+
+  get balances(): Array<Bytes> {
+    let value = this.get("balances");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytesArray();
+    }
+  }
+
+  set balances(value: Array<Bytes>) {
+    this.set("balances", Value.fromBytesArray(value));
+  }
+
+  get proposals(): Array<string> {
+    let value = this.get("proposals");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toStringArray();
+    }
+  }
+}
+
+export class Proposal extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Proposal entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Proposal must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Proposal", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): Proposal | null {
+    return changetype<Proposal | null>(store.get_in_block("Proposal", id));
+  }
+
+  static load(id: string): Proposal | null {
+    return changetype<Proposal | null>(store.get("Proposal", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
   }
 
   get dAO(): Bytes | null {
@@ -1302,6 +1274,19 @@ export class Proposal extends Entity {
     } else {
       this.set("dAO", Value.fromBytes(<Bytes>value));
     }
+  }
+
+  get nonce(): BigInt {
+    let value = this.get("nonce");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set nonce(value: BigInt) {
+    this.set("nonce", Value.fromBigInt(value));
   }
 
   get theseusDAO(): Bytes | null {
@@ -1854,10 +1839,6 @@ export class VAmm extends Entity {
     }
   }
 
-  set ffrs(value: Array<Bytes>) {
-    this.set("ffrs", Value.fromBytesArray(value));
-  }
-
   get currentIndex(): BigInt {
     let value = this.get("currentIndex");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1895,19 +1876,6 @@ export class VAmm extends Entity {
 
   set isFrozen(value: boolean) {
     this.set("isFrozen", Value.fromBoolean(value));
-  }
-
-  get exchangeAddress(): Bytes {
-    let value = this.get("exchangeAddress");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set exchangeAddress(value: Bytes) {
-    this.set("exchangeAddress", Value.fromBytes(value));
   }
 
   get name(): string {
@@ -1951,6 +1919,15 @@ export class VAmm extends Entity {
 
   get snapshots(): Array<Bytes> {
     let value = this.get("snapshots");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytesArray();
+    }
+  }
+
+  get priceData(): Array<Bytes> {
+    let value = this.get("priceData");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -2039,17 +2016,17 @@ export class Snapshot extends Entity {
     this.set("blockTimestamp", Value.fromBigInt(value));
   }
 
-  get marketPrice(): BigInt {
+  get marketPrice(): BigDecimal {
     let value = this.get("marketPrice");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigInt();
+      return value.toBigDecimal();
     }
   }
 
-  set marketPrice(value: BigInt) {
-    this.set("marketPrice", Value.fromBigInt(value));
+  set marketPrice(value: BigDecimal) {
+    this.set("marketPrice", Value.fromBigDecimal(value));
   }
 
   get quoteAssetReserve(): BigInt {
@@ -2210,6 +2187,102 @@ export class FFR extends Entity {
   }
 }
 
+export class PriceData extends Entity {
+  constructor(id: Bytes) {
+    super();
+    this.set("id", Value.fromBytes(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save PriceData entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.BYTES,
+        `Entities of type PriceData must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("PriceData", id.toBytes().toHexString(), this);
+    }
+  }
+
+  static loadInBlock(id: Bytes): PriceData | null {
+    return changetype<PriceData | null>(
+      store.get_in_block("PriceData", id.toHexString())
+    );
+  }
+
+  static load(id: Bytes): PriceData | null {
+    return changetype<PriceData | null>(
+      store.get("PriceData", id.toHexString())
+    );
+  }
+
+  get id(): Bytes {
+    let value = this.get("id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set id(value: Bytes) {
+    this.set("id", Value.fromBytes(value));
+  }
+
+  get timeStamp(): BigInt {
+    let value = this.get("timeStamp");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set timeStamp(value: BigInt) {
+    this.set("timeStamp", Value.fromBigInt(value));
+  }
+
+  get vAmm(): Bytes {
+    let value = this.get("vAmm");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set vAmm(value: Bytes) {
+    this.set("vAmm", Value.fromBytes(value));
+  }
+
+  get marketPrice(): BigDecimal {
+    let value = this.get("marketPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set marketPrice(value: BigDecimal) {
+    this.set("marketPrice", Value.fromBigDecimal(value));
+  }
+
+  get indexPrice(): BigInt {
+    let value = this.get("indexPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set indexPrice(value: BigInt) {
+    this.set("indexPrice", Value.fromBigInt(value));
+  }
+}
+
 export class Balance extends Entity {
   constructor(id: Bytes) {
     super();
@@ -2347,17 +2420,17 @@ export class TheseusDAO extends Entity {
     this.set("stakes", Value.fromBytesArray(value));
   }
 
-  get proposals(): Array<Bytes> {
+  get proposals(): Array<string> {
     let value = this.get("proposals");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBytesArray();
+      return value.toStringArray();
     }
   }
 
-  set proposals(value: Array<Bytes>) {
-    this.set("proposals", Value.fromBytesArray(value));
+  set proposals(value: Array<string>) {
+    this.set("proposals", Value.fromStringArray(value));
   }
 
   get poolTokens(): Array<Bytes> {

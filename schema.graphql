@@ -78,26 +78,25 @@ type LoanPoolTheseus @entity{
   theseusDAO: TheseusDAO! # TheseusDAO
 }
 type AriadneDAO @entity{
-  id:Bytes!
-  ammPool: Bytes! # address!
-  balances: [Balance!]! # Balance[]
-  proposals: [Proposal!]!@derivedFrom(field: "dAO")
-  maxTradingFee: BigInt! # uint256
-  minTradingFee: BigInt! # uint256
-  poolTokens: [PoolToken!]! # PoolToken[]
+  id:Bytes! #contract address
   currentId: BigInt! # uint256
+  ammPool: VAmm! # address!
   votingTime: BigInt! # uint256
   maxVotingPower: BigInt! # uint256
   minVotingPower: BigInt! # uint256
-  tokenId: BigInt! # uint256
   votesNeededPercentage: BigInt! # uint256
+  tokenId: BigInt! # uint256
+  poolToken: PoolToken! # PoolToken
+  balances: [Balance!]! # Balance[]
+  proposals: [Proposal!]!@derivedFrom(field: "dAO")
 }
 type Proposal @entity{
-  id:Bytes!
+  id:String!
   dAO: AriadneDAO # 
+  nonce: BigInt! # uint256
   theseusDAO: TheseusDAO # TheseusDAO
   proposer: Bytes! # address!
-  to: Bytes! # address!
+  to: Bytes! # address! 
   value: BigInt! # uint256
   data: Bytes! # bytes!
   result: Bytes! # bytes!
@@ -136,22 +135,22 @@ type StakeByPool @entity{
 type VAmm @entity{
   id:Bytes!
   loanPool: LoanPool! # LoanPool!
-  ffrs: [FFR!]! # FFR[]
+  ffrs: [FFR!]!@derivedFrom(field:"vAmm") # FFR[]
   currentIndex: BigInt! # uint256
   totalPositionSize: BigInt! # uint256
   isFrozen: Boolean! # bool
-  exchangeAddress: Bytes! # address!
   name: String! # string
   symbol: String! # string
   payload: String! # string
   snapshots: [Snapshot!]! @derivedFrom(field: "vamm")
+  priceData: [PriceData!]! @derivedFrom(field: "vAmm")
 }
 type Snapshot @entity{
   id:Bytes!
   index: BigInt! # uint256
   vamm: VAmm! # VAmm!
   blockTimestamp: BigInt! # uint256
-  marketPrice: BigInt! # uint256
+  marketPrice: BigDecimal! # uint256
   quoteAssetReserve: BigInt! # uint256
   baseAssetReserve: BigInt! # uint256
   indexPrice: BigInt! # uint256
@@ -165,6 +164,13 @@ type FFR @entity(immutable: true){
   vAmm: VAmm! # VAmm!
   ffr: BigInt! # uint256
   index: BigInt! # uint256
+}
+type PriceData @entity(immutable: true){
+  id:Bytes! #amm with timestamp
+  timeStamp: BigInt! # uint256
+  vAmm: VAmm! # VAmm!
+  marketPrice: BigDecimal! 
+  indexPrice: BigInt! # uint256
 }
 
 type Balance @entity{

@@ -1,50 +1,45 @@
+import { BigInt, bigDecimal, bigInt } from "@graphprotocol/graph-ts"
 import {
   AriadneCreated as AriadneCreatedEvent,
   AriadneMaxVotingPowerChanged as AriadneMaxVotingPowerChangedEvent,
   AriadneMinVotingPowerChanged as AriadneMinVotingPowerChangedEvent,
   AriadneVotesNeededPercentageChanged as AriadneVotesNeededPercentageChangedEvent,
   AriadneVotingTimeChanged as AriadneVotingTimeChangedEvent,
+  CreateAriadnes,
   ExecutedTransaction as ExecutedTransactionEvent,
   ProposalMade as ProposalMadeEvent
 } from "../generated/CreateAriadnes/CreateAriadnes"
 import {
-  AriadneCreated,
-  AriadneMaxVotingPowerChanged,
-  AriadneMinVotingPowerChanged,
-  AriadneVotesNeededPercentageChanged,
-  AriadneVotingTimeChanged,
-  ExecutedTransaction,
-  ProposalMade
-} from "../generated/schema"
+  AriadneDAO,PriceData,
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
+ } from "../generated/schema"
 
 export function handleAriadneCreated(event: AriadneCreatedEvent): void {
-  let entity = new AriadneCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.contractId = event.params.contractId
-  entity.name = event.params.name
-  entity.contractAddress = event.params.contractAddress
-  entity.ammAddress = event.params.ammAddress
+  let entity = new AriadneDAO(event.params.contractAddress)
+  entity.ammPool = event.params.ammAddress
+  entity.currentId = BigInt.zero()
+  entity.ammPool = event.params.ammAddress
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
 
+  //calling conteract for variables
+  let contract = CreateAriadnes.bind(event.address)
+  entity.maxVotingPower = contract.maxVotingPower()
+  entity.votesNeededPercentage = contract.votesNeededPercentage()
+  entity.minVotingPower = contract.minVotingPower()
+  entity.votingTime = contract.votingTime()
+  entity.tokenId = contract.numberOfAriadnes()
   entity.save()
 }
 
 export function handleAriadneMaxVotingPowerChanged(
   event: AriadneMaxVotingPowerChangedEvent
 ): void {
-  let entity = new AriadneMaxVotingPowerChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ariadneDAO = event.params.ariadneDAO
+  let id = event.params.ariadneDAO
+  let entity = AriadneDAO.load(id)
+  if (entity == null) {
+    entity = new AriadneDAO(id)
+  }
   entity.maxVotingPower = event.params.maxVotingPower
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
 
   entity.save()
 }
@@ -52,31 +47,27 @@ export function handleAriadneMaxVotingPowerChanged(
 export function handleAriadneMinVotingPowerChanged(
   event: AriadneMinVotingPowerChangedEvent
 ): void {
-  let entity = new AriadneMinVotingPowerChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ariadneDAO = event.params.ariadneDAO
+ 
+  let id = event.params.ariadneDAO
+  let entity = AriadneDAO.load(id)
+  if (entity == null) {
+    entity = new AriadneDAO(id)
+  }
   entity.minVotingPower = event.params.minVotingPower
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
+  
   entity.save()
 }
 
 export function handleAriadneVotesNeededPercentageChanged(
   event: AriadneVotesNeededPercentageChangedEvent
 ): void {
-  let entity = new AriadneVotesNeededPercentageChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ariadneDAO = event.params.ariadneDAO
+  let id = event.params.ariadneDAO
+  let entity = AriadneDAO.load(id)
+  if (entity == null) {
+    entity = new AriadneDAO(id)
+  }
   entity.votesNeededPercentage = event.params.votesNeededPercentage
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
 
   entity.save()
 }
@@ -84,15 +75,12 @@ export function handleAriadneVotesNeededPercentageChanged(
 export function handleAriadneVotingTimeChanged(
   event: AriadneVotingTimeChangedEvent
 ): void {
-  let entity = new AriadneVotingTimeChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ariadneDAO = event.params.ariadneDAO
+  let id = event.params.ariadneDAO
+  let entity = AriadneDAO.load(id)
+  if (entity == null) {
+    entity = new AriadneDAO(id)
+  }
   entity.votingTime = event.params.votingTime
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
 
   entity.save()
 }
@@ -100,36 +88,34 @@ export function handleAriadneVotingTimeChanged(
 export function handleExecutedTransaction(
   event: ExecutedTransactionEvent
 ): void {
-  let entity = new ExecutedTransaction(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ariadneDAO = event.params.ariadneDAO
-  entity.executor = event.params.executor
-  entity.nonce = event.params.nonce
-  entity.result = event.params.result
+  let id = event.params.ariadneDAO
+  let entity = AriadneDAO.load(id)
+  if (entity == null) {
+    entity = new AriadneDAO(id)
+  }
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
 
   entity.save()
 }
 
 export function handleProposalMade(event: ProposalMadeEvent): void {
-  let entity = new ProposalMade(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ariadneDAO = event.params.ariadneDAO
-  entity.proposer = event.params.proposer
-  entity.to = event.params.to
-  entity.data = event.params.data
-  entity.nonce = event.params.nonce
-  entity.transactionHash = event.params.transactionHash
-  entity.timeStamp = event.params.timeStamp
+  let id = event.params.ariadneDAO
+  let ariadne = AriadneDAO.load(id)
+  if (ariadne == null) {
+    ariadne = new AriadneDAO(id)
+  }
+  let proposeId = event.params.nonce
+  let proposal = new Proposal(event.params.ariadneDAO.toString().concat('-').concat(proposeId.toString()))
+  proposal.dAO = event.params.ariadneDAO
+  proposal.nonce = event.params.nonce
+  proposal.proposer = event.params.proposer
+  proposal.to = event.params.to
+  proposal.transactionHash = event.params.transactionHash
+  proposal.isPassed = false
+  proposal.proposedAt = event.block.timestamp
+  proposal.data = event.params.data
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  ariadne.currentId = event.params.nonce.plus(BigInt.fromI32(1))
+  proposal.save()
+  ariadne.save()
 }
