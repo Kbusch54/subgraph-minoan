@@ -16,6 +16,7 @@ type Trade @entity{
   vamm: VAmm! # address!
   tradeBalance: TradeBalance!# TradeBalance
   created: BigInt! # uint256
+  startingCost: BigInt! # uint256
   isActive: Boolean! # bool
 }
 
@@ -71,9 +72,9 @@ type TheseusDAO @entity{
   minVotingPower: BigInt! # uint256
   tokenId: BigInt! # uint256
   votesNeededPercentage: BigInt! # uint256
-  insuranceFund: BigInt! # uint256
   insuranceFundMin: BigInt! # uint256
   loanPoolTheseus: LoanPoolTheseus! # LoanPoolTheseus
+  balances: [Balance!]! # Balance[]
 }
 type LoanPoolTheseus @entity{
   id:Bytes!

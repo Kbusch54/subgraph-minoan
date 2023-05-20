@@ -241,6 +241,19 @@ export class Trade extends Entity {
     this.set("created", Value.fromBigInt(value));
   }
 
+  get startingCost(): BigInt {
+    let value = this.get("startingCost");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set startingCost(value: BigInt) {
+    this.set("startingCost", Value.fromBigInt(value));
+  }
+
   get isActive(): boolean {
     let value = this.get("isActive");
     if (!value || value.kind == ValueKind.NULL) {
@@ -981,19 +994,6 @@ export class TheseusDAO extends Entity {
     this.set("votesNeededPercentage", Value.fromBigInt(value));
   }
 
-  get insuranceFund(): BigInt {
-    let value = this.get("insuranceFund");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set insuranceFund(value: BigInt) {
-    this.set("insuranceFund", Value.fromBigInt(value));
-  }
-
   get insuranceFundMin(): BigInt {
     let value = this.get("insuranceFundMin");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1018,6 +1018,19 @@ export class TheseusDAO extends Entity {
 
   set loanPoolTheseus(value: Bytes) {
     this.set("loanPoolTheseus", Value.fromBytes(value));
+  }
+
+  get balances(): Array<Bytes> {
+    let value = this.get("balances");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytesArray();
+    }
+  }
+
+  set balances(value: Array<Bytes>) {
+    this.set("balances", Value.fromBytesArray(value));
   }
 }
 

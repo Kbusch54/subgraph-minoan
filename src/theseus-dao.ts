@@ -71,7 +71,6 @@ export function handleProposalMade(event: ProposalMadeEvent): void {
     theseus.votingTime = conract.votingTime()
     theseus.tokenId = BigInt.fromI32(0)
     theseus.insuranceFundMin = conract.insuranceFundMin()
-    theseus.insuranceFund = BigInt.fromI32(0)
   }
   let proposeId = event.params.nonce
   let proposal = new Proposal(event.address.toString().concat('-').concat(proposeId.toString()))
