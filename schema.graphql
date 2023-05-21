@@ -193,18 +193,3 @@ type Debt @entity{
   amountOwed: BigInt! # uint256
   loanPool: LoanPool! # LoanPool
 }
-
-
-type ProposalMade @entity(immutable: true) {
-  id: Bytes!
-  proposer: Bytes! # address
-  to: Bytes! # address
-  data: Bytes! # bytes
-  nonce: BigInt! # uint256
-  transactionHash: Bytes! # bytes32
-  timeStamp: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-

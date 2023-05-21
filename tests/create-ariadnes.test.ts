@@ -25,11 +25,13 @@ describe("Describe entity assertions", () => {
     let ammAddress = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
+    let tokenId = BigInt.fromI32(234)
     let newAriadneCreatedEvent = createAriadneCreatedEvent(
       contractId,
       name,
       contractAddress,
-      ammAddress
+      ammAddress,
+      tokenId
     )
     handleAriadneCreated(newAriadneCreatedEvent)
   })
@@ -68,6 +70,12 @@ describe("Describe entity assertions", () => {
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "ammAddress",
       "0x0000000000000000000000000000000000000001"
+    )
+    assert.fieldEquals(
+      "AriadneCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "tokenId",
+      "234"
     )
 
     // More assert options:

@@ -1,26 +1,25 @@
 {
   "goerli": {
     "Exchange": {
-      "address": "0xd98387fC0Dcdf7FF2DF0E252B0E351f608Aad48A",
-      "startBlock": 9016915
+      "address": "0xbf68D4a14c353B9781e5c481413DaEa0d9bD5405"
     },
     "Contract": {
       "address": "0xc4b9f4e8d1ccbc5fad290840ee8f5fc96479a7d5"
     },
     "TheseusDAO": {
-      "address": "0x77BC795BedA4DA1f45339DC85126a7fcb1F90671"
+      "address": "0xA547af463d3A202e0E85CA766FB67eE0395e4D5C"
     },
     "CreateAriadnes": {
-      "address": "0xeA0b45d79DfFf9D0eA96d549d5247700dEa7e149"
+      "address": "0xdE6B4693B7bD623Ab2614Ed2D76593D791e19F65"
     },
     "AmmViewer": {
-      "address": "0x0c2BacF2DB04a25EA5DEF92aB115Ba5770Be3f6E"
+      "address": "0xbCeF8b88c81eE970B5BF388C05a2b2419b51dCcC"
     },
     "LoanPool": {
-      "address": "0x31a6314fE6a87EA0F98969765753f7e6573963CF"
+      "address": "0xa71Cb4B8850063e8cdddC1438FbFF20d901ef0e5"
     },
     "Staking": {
-      "address": "0x37f5CEC042b1E78E8a60cDF5A11867108Ae0b17c"
+      "address": "0x0C9dfCBe62a84344fE53B2B39f9dc9906bbdEFC4"
     }
   }
 }

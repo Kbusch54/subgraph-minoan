@@ -399,11 +399,7 @@
       { "internalType": "bytes", "name": "_tradeId", "type": "bytes" }
     ],
     "name": "closeOutPosition",
-    "outputs": [
-      { "internalType": "bool", "name": "", "type": "bool" },
-      { "internalType": "int256", "name": "", "type": "int256" },
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -435,15 +431,6 @@
     "name": "exchangeViewer",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "_amm", "type": "address" }
-    ],
-    "name": "freezeStaking",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -518,13 +505,6 @@
     "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "name": "poolAvailableUsdc",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "poolFFRFund",
-    "outputs": [{ "internalType": "int256", "name": "", "type": "int256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -660,13 +640,6 @@
     "inputs": [],
     "name": "theseusDao",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "totalTradeCollateral",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },

@@ -486,6 +486,28 @@ export class TradingFeeSet__Params {
   }
 }
 
+export class UpdateTheseus extends ethereum.Event {
+  get params(): UpdateTheseus__Params {
+    return new UpdateTheseus__Params(this);
+  }
+}
+
+export class UpdateTheseus__Params {
+  _event: UpdateTheseus;
+
+  constructor(event: UpdateTheseus) {
+    this._event = event;
+  }
+
+  get oldTheseus(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get newTheseus(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
 export class LoanPool__interestOwedResult {
   value0: BigInt;
   value1: BigInt;
@@ -1353,6 +1375,40 @@ export class BorrowCall__Outputs {
 
   get value0(): boolean {
     return this._call.outputValues[0].value.toBoolean();
+  }
+}
+
+export class FullRepaymentFailedCall extends ethereum.Call {
+  get inputs(): FullRepaymentFailedCall__Inputs {
+    return new FullRepaymentFailedCall__Inputs(this);
+  }
+
+  get outputs(): FullRepaymentFailedCall__Outputs {
+    return new FullRepaymentFailedCall__Outputs(this);
+  }
+}
+
+export class FullRepaymentFailedCall__Inputs {
+  _call: FullRepaymentFailedCall;
+
+  constructor(call: FullRepaymentFailedCall) {
+    this._call = call;
+  }
+
+  get _tradeId(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+
+  get _amm(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+}
+
+export class FullRepaymentFailedCall__Outputs {
+  _call: FullRepaymentFailedCall;
+
+  constructor(call: FullRepaymentFailedCall) {
+    this._call = call;
   }
 }
 

@@ -58,6 +58,12 @@
         "internalType": "address",
         "name": "ammPool",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokensMinted",
+        "type": "uint256"
       }
     ],
     "name": "Stake",
@@ -102,6 +108,12 @@
         "internalType": "address",
         "name": "ammPool",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokensBurned",
+        "type": "uint256"
       }
     ],
     "name": "Unstake",

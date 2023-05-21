@@ -3,12 +3,82 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
+    name: Staking
+    network: goerli
+    source:
+      address: "0x0C9dfCBe62a84344fE53B2B39f9dc9906bbdEFC4"
+      abi: Staking
+      startBlock: 9040710
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AddTokenToPool
+        - FrozenStake
+        - Stake
+        - UnFrozenStake
+        - Unstake
+      abis:
+        - name: Staking
+          file: ./abis/Staking.json
+      eventHandlers:
+        - event: AddTokenToPool(address,uint256)
+          handler: handleAddTokenToPool
+        - event: FrozenStake(address)
+          handler: handleFrozenStake
+        - event: Stake(address,uint256,uint256,address,uint256)
+          handler: handleStake
+        - event: UnFrozenStake(address)
+          handler: handleUnFrozenStake
+        - event: Unstake(address,uint256,uint256,address,uint256)
+          handler: handleUnstake
+      file: ./src/staking.ts
+  - kind: ethereum
+    name: TheseusDAO
+    network: goerli
+    source:
+      address: "0xA547af463d3A202e0E85CA766FB67eE0395e4D5C"
+      abi: TheseusDAO
+      startBlock: 9040709
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ExecuteTransaction
+        - InsuranceFundMinChanged
+        - MaxVotingPowerChanged
+        - MinVotingPowerChanged
+        - ProposalMade
+        - VotesNeededPercentageChanged
+        - VotingTimeChanged
+      abis:
+        - name: TheseusDAO
+          file: ./abis/TheseusDAO.json
+      eventHandlers:
+        - event: ExecuteTransaction(indexed address,uint256,bytes)
+          handler: handleExecuteTransaction
+        - event: InsuranceFundMinChanged(uint256)
+          handler: handleInsuranceFundMinChanged
+        - event: MaxVotingPowerChanged(uint256)
+          handler: handleMaxVotingPowerChanged
+        - event: MinVotingPowerChanged(uint256)
+          handler: handleMinVotingPowerChanged
+        - event: ProposalMade(indexed address,indexed address,bytes,uint256,bytes32,uint256)
+          handler: handleProposalMade
+        - event: VotesNeededPercentageChanged(uint256)
+          handler: handleVotesNeededPercentageChanged
+        - event: VotingTimeChanged(uint256)
+          handler: handleVotingTimeChanged
+      file: ./src/theseus-dao.ts
+  - kind: ethereum
     name: Exchange
     network: goerli
     source:
-      address: "0xce30471cA2438e49409B2f07Ad7256f8f43A9302"
+      address: "0xbf68D4a14c353B9781e5c481413DaEa0d9bD5405"
       abi: Exchange
-      startBlock: 9029015
+      startBlock: 9040714
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -59,9 +129,9 @@ dataSources:
     name: CreateAriadnes
     network: goerli
     source:
-      address: "0x65e939FC9982a97cc082AF28E7745AE57fA1Ddd5"
+      address: "0xdE6B4693B7bD623Ab2614Ed2D76593D791e19F65"
       abi: CreateAriadnes
-      startBlock: 9029015
+      startBlock: 9040712
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -78,7 +148,7 @@ dataSources:
         - name: CreateAriadnes
           file: ./abis/CreateAriadnes.json
       eventHandlers:
-        - event: AriadneCreated(indexed uint256,string,indexed address,indexed address)
+        - event: AriadneCreated(indexed uint256,string,indexed address,indexed address,uint256)
           handler: handleAriadneCreated
         - event: AriadneMaxVotingPowerChanged(indexed address,indexed uint256)
           handler: handleAriadneMaxVotingPowerChanged
@@ -98,9 +168,9 @@ dataSources:
     name: AmmViewer
     network: goerli
     source:
-      address: "0xe503841ca51216514d1638bE712a6a88A349bF4E"
+      address: "0xbCeF8b88c81eE970B5BF388C05a2b2419b51dCcC"
       abi: AmmViewer
-      startBlock: 9029015
+      startBlock: 9040719
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -139,9 +209,9 @@ dataSources:
     name: LoanPool
     network: goerli
     source:
-      address: "0xc37E852B05500e0FB4312003c757b250BB5c1c32"
+      address: "0xa71Cb4B8850063e8cdddC1438FbFF20d901ef0e5"
       abi: LoanPool
-      startBlock: 9029015
+      startBlock: 9040715
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -167,6 +237,7 @@ dataSources:
         - LoanPoolPayInterest
         - RepayLoan
         - TradingFeeSet
+        - UpdateTheseus
       abis:
         - name: LoanPool
           file: ./abis/LoanPool.json
@@ -212,74 +283,6 @@ dataSources:
           handler: handleRepayLoan
         - event: TradingFeeSet(uint256,indexed address)
           handler: handleTradingFeeSet
+        - event: UpdateTheseus(address,address)
+          handler: handleUpdateTheseus
       file: ./src/loan-pool.ts
-  - kind: ethereum
-    name: Staking
-    network: goerli
-    source:
-      address: "0xF5f8b38bFf710d3deFfBf40d776976104d11151b"
-      abi: Staking
-      startBlock: 9029015
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - AddTokenToPool
-        - FrozenStake
-        - Stake
-        - UnFrozenStake
-        - Unstake
-      abis:
-        - name: Staking
-          file: ./abis/Staking.json
-      eventHandlers:
-        - event: AddTokenToPool(address,uint256)
-          handler: handleAddTokenToPool
-        - event: FrozenStake(address)
-          handler: handleFrozenStake
-        - event: Stake(address,uint256,uint256,address)
-          handler: handleStake
-        - event: UnFrozenStake(address)
-          handler: handleUnFrozenStake
-        - event: Unstake(address,uint256,uint256,address)
-          handler: handleUnstake
-      file: ./src/staking.ts
-  - kind: ethereum
-    name: TheseusDAO
-    network: goerli
-    source:
-      address: "0x77BC795BedA4DA1f45339DC85126a7fcb1F90671"
-      abi: TheseusDAO
-      startBlock: 9029016
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - ExecuteTransaction
-        - InsuranceFundMinChanged
-        - MaxVotingPowerChanged
-        - MinVotingPowerChanged
-        - ProposalMade
-        - VotesNeededPercentageChanged
-        - VotingTimeChanged
-      abis:
-        - name: TheseusDAO
-          file: ./abis/TheseusDAO.json
-      eventHandlers:
-        - event: ExecuteTransaction(indexed address,uint256,bytes)
-          handler: handleExecuteTransaction
-        - event: InsuranceFundMinChanged(uint256)
-          handler: handleInsuranceFundMinChanged
-        - event: MaxVotingPowerChanged(uint256)
-          handler: handleMaxVotingPowerChanged
-        - event: MinVotingPowerChanged(uint256)
-          handler: handleMinVotingPowerChanged
-        - event: ProposalMade(indexed address,indexed address,bytes,uint256,bytes32,uint256)
-          handler: handleProposalMade
-        - event: VotesNeededPercentageChanged(uint256)
-          handler: handleVotesNeededPercentageChanged
-        - event: VotingTimeChanged(uint256)
-          handler: handleVotingTimeChanged
-      file: ./src/theseus-dao.ts

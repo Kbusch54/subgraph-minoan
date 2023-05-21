@@ -326,38 +326,6 @@ export class Withdraw__Params {
   }
 }
 
-export class Exchange__closeOutPositionResult {
-  value0: boolean;
-  value1: BigInt;
-  value2: BigInt;
-
-  constructor(value0: boolean, value1: BigInt, value2: BigInt) {
-    this.value0 = value0;
-    this.value1 = value1;
-    this.value2 = value2;
-  }
-
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromBoolean(this.value0));
-    map.set("value1", ethereum.Value.fromSignedBigInt(this.value1));
-    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
-    return map;
-  }
-
-  getValue0(): boolean {
-    return this.value0;
-  }
-
-  getValue1(): BigInt {
-    return this.value1;
-  }
-
-  getValue2(): BigInt {
-    return this.value2;
-  }
-}
-
 export class Exchange__decodeTradeIdResult {
   value0: Address;
   value1: Address;
@@ -604,41 +572,6 @@ export class Exchange extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  closeOutPosition(_tradeId: Bytes): Exchange__closeOutPositionResult {
-    let result = super.call(
-      "closeOutPosition",
-      "closeOutPosition(bytes):(bool,int256,uint256)",
-      [ethereum.Value.fromBytes(_tradeId)]
-    );
-
-    return new Exchange__closeOutPositionResult(
-      result[0].toBoolean(),
-      result[1].toBigInt(),
-      result[2].toBigInt()
-    );
-  }
-
-  try_closeOutPosition(
-    _tradeId: Bytes
-  ): ethereum.CallResult<Exchange__closeOutPositionResult> {
-    let result = super.tryCall(
-      "closeOutPosition",
-      "closeOutPosition(bytes):(bool,int256,uint256)",
-      [ethereum.Value.fromBytes(_tradeId)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      new Exchange__closeOutPositionResult(
-        value[0].toBoolean(),
-        value[1].toBigInt(),
-        value[2].toBigInt()
-      )
-    );
-  }
-
   decodeTradeId(encodedData: Bytes): Exchange__decodeTradeIdResult {
     let result = super.call(
       "decodeTradeId",
@@ -880,25 +813,6 @@ export class Exchange extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  poolFFRFund(param0: Address): BigInt {
-    let result = super.call("poolFFRFund", "poolFFRFund(address):(int256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_poolFFRFund(param0: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("poolFFRFund", "poolFFRFund(address):(int256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   poolOutstandingLoans(param0: Address): BigInt {
     let result = super.call(
       "poolOutstandingLoans",
@@ -1082,29 +996,6 @@ export class Exchange extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  totalTradeCollateral(param0: Address): BigInt {
-    let result = super.call(
-      "totalTradeCollateral",
-      "totalTradeCollateral(address):(uint256)",
-      [ethereum.Value.fromAddress(param0)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_totalTradeCollateral(param0: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "totalTradeCollateral",
-      "totalTradeCollateral(address):(uint256)",
-      [ethereum.Value.fromAddress(param0)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   tradeBalance(param0: Bytes): BigInt {
@@ -1508,18 +1399,6 @@ export class CloseOutPositionCall__Outputs {
   constructor(call: CloseOutPositionCall) {
     this._call = call;
   }
-
-  get value0(): boolean {
-    return this._call.outputValues[0].value.toBoolean();
-  }
-
-  get value1(): BigInt {
-    return this._call.outputValues[1].value.toBigInt();
-  }
-
-  get value2(): BigInt {
-    return this._call.outputValues[2].value.toBigInt();
-  }
 }
 
 export class DepositCall extends ethereum.Call {
@@ -1548,36 +1427,6 @@ export class DepositCall__Outputs {
   _call: DepositCall;
 
   constructor(call: DepositCall) {
-    this._call = call;
-  }
-}
-
-export class FreezeStakingCall extends ethereum.Call {
-  get inputs(): FreezeStakingCall__Inputs {
-    return new FreezeStakingCall__Inputs(this);
-  }
-
-  get outputs(): FreezeStakingCall__Outputs {
-    return new FreezeStakingCall__Outputs(this);
-  }
-}
-
-export class FreezeStakingCall__Inputs {
-  _call: FreezeStakingCall;
-
-  constructor(call: FreezeStakingCall) {
-    this._call = call;
-  }
-
-  get _amm(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class FreezeStakingCall__Outputs {
-  _call: FreezeStakingCall;
-
-  constructor(call: FreezeStakingCall) {
     this._call = call;
   }
 }

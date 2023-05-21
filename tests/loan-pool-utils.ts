@@ -20,7 +20,8 @@ import {
   PayDebt,
   PayInterest,
   RepayLoan,
-  TradingFeeSet
+  TradingFeeSet,
+  UpdateTheseus
 } from "../generated/LoanPool/LoanPool"
 
 export function createAddDebtEvent(amm: Address, amount: BigInt): AddDebt {
@@ -496,4 +497,28 @@ export function createTradingFeeSetEvent(
   )
 
   return tradingFeeSetEvent
+}
+
+export function createUpdateTheseusEvent(
+  oldTheseus: Address,
+  newTheseus: Address
+): UpdateTheseus {
+  let updateTheseusEvent = changetype<UpdateTheseus>(newMockEvent())
+
+  updateTheseusEvent.parameters = new Array()
+
+  updateTheseusEvent.parameters.push(
+    new ethereum.EventParam(
+      "oldTheseus",
+      ethereum.Value.fromAddress(oldTheseus)
+    )
+  )
+  updateTheseusEvent.parameters.push(
+    new ethereum.EventParam(
+      "newTheseus",
+      ethereum.Value.fromAddress(newTheseus)
+    )
+  )
+
+  return updateTheseusEvent
 }

@@ -14,7 +14,8 @@ export function createAriadneCreatedEvent(
   contractId: BigInt,
   name: string,
   contractAddress: Address,
-  ammAddress: Address
+  ammAddress: Address,
+  tokenId: BigInt
 ): AriadneCreated {
   let ariadneCreatedEvent = changetype<AriadneCreated>(newMockEvent())
 
@@ -39,6 +40,12 @@ export function createAriadneCreatedEvent(
     new ethereum.EventParam(
       "ammAddress",
       ethereum.Value.fromAddress(ammAddress)
+    )
+  )
+  ariadneCreatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
     )
   )
 

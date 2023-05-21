@@ -45,7 +45,8 @@ export function createStakeEvent(
   user: Address,
   usdcAmount: BigInt,
   tokenId: BigInt,
-  ammPool: Address
+  ammPool: Address,
+  tokensMinted: BigInt
 ): Stake {
   let stakeEvent = changetype<Stake>(newMockEvent())
 
@@ -69,6 +70,12 @@ export function createStakeEvent(
   stakeEvent.parameters.push(
     new ethereum.EventParam("ammPool", ethereum.Value.fromAddress(ammPool))
   )
+  stakeEvent.parameters.push(
+    new ethereum.EventParam(
+      "tokensMinted",
+      ethereum.Value.fromUnsignedBigInt(tokensMinted)
+    )
+  )
 
   return stakeEvent
 }
@@ -89,7 +96,8 @@ export function createUnstakeEvent(
   user: Address,
   usdcAmount: BigInt,
   tokenId: BigInt,
-  ammPool: Address
+  ammPool: Address,
+  tokensBurned: BigInt
 ): Unstake {
   let unstakeEvent = changetype<Unstake>(newMockEvent())
 
@@ -112,6 +120,12 @@ export function createUnstakeEvent(
   )
   unstakeEvent.parameters.push(
     new ethereum.EventParam("ammPool", ethereum.Value.fromAddress(ammPool))
+  )
+  unstakeEvent.parameters.push(
+    new ethereum.EventParam(
+      "tokensBurned",
+      ethereum.Value.fromUnsignedBigInt(tokensBurned)
+    )
   )
 
   return unstakeEvent

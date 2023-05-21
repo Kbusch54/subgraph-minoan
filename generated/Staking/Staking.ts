@@ -78,6 +78,10 @@ export class Stake__Params {
   get ammPool(): Address {
     return this._event.parameters[3].value.toAddress();
   }
+
+  get tokensMinted(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
+  }
 }
 
 export class UnFrozenStake extends ethereum.Event {
@@ -125,6 +129,10 @@ export class Unstake__Params {
 
   get ammPool(): Address {
     return this._event.parameters[3].value.toAddress();
+  }
+
+  get tokensBurned(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
   }
 }
 

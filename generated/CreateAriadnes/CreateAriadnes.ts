@@ -38,6 +38,10 @@ export class AriadneCreated__Params {
   get ammAddress(): Address {
     return this._event.parameters[3].value.toAddress();
   }
+
+  get tokenId(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
+  }
 }
 
 export class AriadneMaxVotingPowerChanged extends ethereum.Event {
