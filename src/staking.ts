@@ -1,84 +1,107 @@
+import { BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
   AddTokenToPool as AddTokenToPoolEvent,
   FrozenStake as FrozenStakeEvent,
   Stake as StakeEvent,
   UnFrozenStake as UnFrozenStakeEvent,
-  Unstake as UnstakeEvent
+  Unstake as UnstakeEvent,
+  Staking as StakingContract
 } from "../generated/Staking/Staking"
 import {
   AriadneDAO,PriceData,
-  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,
-  Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stakes,TheseusDAO,Trade,TradeBalance,User,VAmm
  } from "../generated/schema"
 
 export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
-  let entity = new AddTokenToPool(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ammPool = event.params.ammPool
-  entity.tokenId = event.params.tokenId
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //PoolToken: ammPool isFrozen tokenID totalSupply
+  let poolToken =  new PoolToken(Bytes.fromBigInt(event.params.tokenId))
+  poolToken.tokenId = event.params.tokenId
+  poolToken.totalSupply = BigInt.fromI32(0)
+  poolToken.ammPool = event.params.ammPool
+  poolToken.isFrozen = false
 }
 
 export function handleFrozenStake(event: FrozenStakeEvent): void {
-  let entity = new FrozenStake(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ammPool = event.params.ammPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  let stakingContract = StakingContract.bind(event.address)
+  let tokenId = stakingContract.ammPoolToTokenId(event.params.ammPool)
+ let poolToken = PoolToken.load(Bytes.fromBigInt(tokenId))
+  if(poolToken != null){
+    poolToken.isFrozen = true
+    poolToken.save()
+  }  
 }
 
 export function handleStake(event: StakeEvent): void {
-  let entity = new Stake(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.user = event.params.user
-  entity.usdcAmount = event.params.usdcAmount
-  entity.tokenId = event.params.tokenId
-  entity.ammPool = event.params.ammPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //balance: avaialbebalance
+  let balance = Balance.load(event.params.user)
+  if (balance != null) {
+    balance.availableUsdc = balance.availableUsdc.minus(event.params.usdcAmount)
+    balance.save()
+  }
+  //tokenBalance: tokensOwnedByUser
+  let stake = Stakes.load(Bytes.fromHexString(event.params.user.toString().concat("-").concat(event.params.tokenId.toString())))
+  if (stake == null) {
+    stake = new Stakes(Bytes.fromHexString(event.params.user.toString().concat("-").concat(event.params.tokenId.toString())))
+    stake.user = event.params.user
+    stake.token = Bytes.fromBigInt(event.params.tokenId)
+    stake.tokensOwnedbByUser = BigInt.fromI32(0)
+    stake.ammPool = event.params.ammPool
+    stake.totalStaked = BigInt.fromI32(0)
+  }
+  stake.tokensOwnedbByUser = stake.tokensOwnedbByUser.plus(event.params.tokensMinted)
+  stake.totalStaked = stake.totalStaked.plus(event.params.usdcAmount)
+  stake.save()
+  //poolToken: totalSupply 
+  let poolToken = PoolToken.load(Bytes.fromBigInt(event.params.tokenId))
+  if (poolToken != null) {
+    poolToken.totalSupply = poolToken.totalSupply.plus(event.params.tokensMinted)
+    poolToken.save()
+  }
+  //poolBalance: totalUSDCBalance availableUSDCBalance 
+  let poolBalance = PoolBalance.load(event.params.ammPool)
+  if (poolBalance != null) {
+    poolBalance.totalUsdcSupply = poolBalance.totalUsdcSupply.plus(event.params.usdcAmount)
+    poolBalance.availableUsdc = poolBalance.availableUsdc.plus(event.params.usdcAmount)
+    poolBalance.save()
+  }
 }
 
 export function handleUnFrozenStake(event: UnFrozenStakeEvent): void {
-  let entity = new UnFrozenStake(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ammPool = event.params.ammPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  let stakingContract = StakingContract.bind(event.address)
+  let tokenId = stakingContract.ammPoolToTokenId(event.params.ammPool)
+  let poolToken = PoolToken.load(Bytes.fromBigInt(tokenId))
+  if(poolToken != null){
+    poolToken.isFrozen = false
+    poolToken.save()
+  }
 }
 
 export function handleUnstake(event: UnstakeEvent): void {
-  let entity = new Unstake(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.user = event.params.user
-  entity.usdcAmount = event.params.usdcAmount
-  entity.tokenId = event.params.tokenId
-  entity.ammPool = event.params.ammPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //balance: avaialbebalance
+  let balance = Balance.load(event.params.user)
+  if (balance != null) {
+    balance.availableUsdc = balance.availableUsdc.plus(event.params.usdcAmount)
+    balance.save()
+  }
+  //poolToken: totalSupply 
+  let poolToken = PoolToken.load(Bytes.fromBigInt(event.params.tokenId))
+  if (poolToken != null) {
+    poolToken.totalSupply = poolToken.totalSupply.minus(event.params.tokensBurned)
+    poolToken.save()
+  }
+  // stakes: totalStaked 
+  let stakes = Stakes.load(Bytes.fromHexString(event.params.user.toString().concat("-").concat(event.params.tokenId.toString())))
+  if (stakes != null) {
+    stakes.totalStaked = stakes.totalStaked.minus(event.params.usdcAmount)
+    stakes.tokensOwnedbByUser = stakes.tokensOwnedbByUser.minus(event.params.tokensBurned)
+    stakes.save()
+  }
+  //poolBalance: totalUSDCBalance availableUSDCBalance 
+  let poolBalance = PoolBalance.load(event.params.ammPool)
+  if (poolBalance != null) {
+    poolBalance.totalUsdcSupply = poolBalance.totalUsdcSupply.minus(event.params.usdcAmount)
+    poolBalance.availableUsdc = poolBalance.availableUsdc.minus(event.params.usdcAmount)
+    poolBalance.save()
+  }
 }
+

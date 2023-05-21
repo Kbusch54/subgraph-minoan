@@ -1,4 +1,4 @@
-import { BigInt, bigDecimal, bigInt } from "@graphprotocol/graph-ts"
+import { BigInt, Bytes, bigDecimal, bigInt } from "@graphprotocol/graph-ts"
 import {
   AriadneCreated as AriadneCreatedEvent,
   AriadneMaxVotingPowerChanged as AriadneMaxVotingPowerChangedEvent,
@@ -11,14 +11,13 @@ import {
 } from "../generated/CreateAriadnes/CreateAriadnes"
 import {
   AriadneDAO,PriceData,
-  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
  } from "../generated/schema"
 
 export function handleAriadneCreated(event: AriadneCreatedEvent): void {
   let entity = new AriadneDAO(event.params.contractAddress)
   entity.ammPool = event.params.ammAddress
   entity.currentId = BigInt.zero()
-  entity.ammPool = event.params.ammAddress
 
 
   //calling conteract for variables
@@ -27,7 +26,8 @@ export function handleAriadneCreated(event: AriadneCreatedEvent): void {
   entity.votesNeededPercentage = contract.votesNeededPercentage()
   entity.minVotingPower = contract.minVotingPower()
   entity.votingTime = contract.votingTime()
-  entity.tokenId = contract.numberOfAriadnes()
+  entity.tokenId = event.params.tokenId
+  entity.poolToken = Bytes.fromBigInt(event.params.tokenId)
   entity.save()
 }
 

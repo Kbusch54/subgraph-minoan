@@ -11,7 +11,7 @@ import {
 } from "../generated/AmmViewer/AmmViewer"
 import {
  AriadneDAO,PriceData,
- Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
+ Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
 } from "../generated/schema"
 
 export function handleAddAmm(event: AddAmmEvent): void {
@@ -22,7 +22,8 @@ export function handleAddAmm(event: AddAmmEvent): void {
   entity.payload = event.params.payload.toString()
   entity.currentIndex = BigInt.fromI32(0)
   entity.isFrozen = true
-
+  entity.totalPositionSize = BigInt.fromI32(0)
+  entity.loanPool = event.params.ammAddr
   entity.save()
 }
 
@@ -36,6 +37,9 @@ export function handleAmmClosePosition(event: AmmClosePositionEvent): void {
   let snapEntity = Snapshot.load(snapId)
   if (snapEntity == null) {
     snapEntity = new Snapshot(snapId)
+    snapEntity.totalPositionSize = entity.totalPositionSize
+    snapEntity.vamm = event.params.ammAddr
+    snapEntity.index = entity.currentIndex
   }
   snapEntity.totalPositionSize.minus(event.params.amount)
   entity.totalPositionSize.minus(event.params.amount)

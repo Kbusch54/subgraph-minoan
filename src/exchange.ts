@@ -17,7 +17,7 @@ import {
 } from "../generated/Exchange/Exchange"
 import {
   AriadneDAO,PriceData,
-  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stakes,TheseusDAO,Trade,TradeBalance,User,VAmm
  } from "../generated/schema"
 
  export  function decodeTradeId(tradeId: Bytes): [Address, Address, BigInt, BigInt] {
@@ -65,12 +65,11 @@ export function handleAddLiquidity(event: AddLiquidityEvent): void {
       tradeBalance.leverage = calc
       let lp = LoanPool.load(trade.ammPool)
       if(lp != null){
-        const tradingFee = lp.tradingFee
         const interestRate = lp.interestRate
         tradeBalance.interestRate = interestRate
       }
-      let exhcnageContract = ExchangeContract.bind(event.address)
-      let avgEntryPrice = exhcnageContract.positions(event.params.tradeId)
+      let exchangeContract = ExchangeContract.bind(event.address)
+      let avgEntryPrice = exchangeContract.positions(event.params.tradeId)
       tradeBalance.entryPrice = avgEntryPrice.value4
       tradeBalance.save()
     }
@@ -85,14 +84,44 @@ export function handleAddLiquidity(event: AddLiquidityEvent): void {
   }
 }
 
- 
-
 export function handleClosePosition(event: ClosePositionEvent): void {
-//  /sdjsjdhjhsd
-// poolbal
-//balance
-//trade
-//tradebalance
+  let tradeId= event.params.tradeId
+  let trade = Trade.load(tradeId)
+  let exhcnageContract = ExchangeContract.bind(event.address)
+  if(trade != null){
+    trade.isActive = false
+    trade.save()
+    let tradeBalance = TradeBalance.load(tradeId)
+    if(tradeBalance != null){
+      tradeBalance.loanAmt = BigInt.fromI32(0)
+      const tradeCollateral = tradeBalance.collateral
+      tradeBalance.collateral = BigInt.fromI32(0)
+      tradeBalance.positionSize = BigInt.fromI32(0)
+      tradeBalance.leverage = BigInt.fromI32(0)
+      tradeBalance.exitPrice = event.params.closePrice
+      tradeBalance.exitTime = event.params.closeTime
+      if(tradeBalance.pnl !=null){
+        tradeBalance.pnl = tradeBalance.pnl.plus(event.params.pnl)
+      }else{
+        tradeBalance.pnl = event.params.pnl
+      }
+      tradeBalance.save()
+      let balance = Balance.load(trade.user)
+      if(balance != null){
+       
+  
+        balance.availableUsdc = exhcnageContract.availableBalance(trade.user)
+        balance.totalCollateralUsdc = balance.totalCollateralUsdc.minus(tradeCollateral)
+        balance.save()
+      }
+      let poolBalance = PoolBalance.load(trade.ammPool)
+      if(poolBalance != null){
+        poolBalance.totalUsdcSupply = exhcnageContract.poolTotalUsdcSupply(trade.ammPool)
+        poolBalance.availableUsdc = exhcnageContract.poolAvailableUsdc(trade.ammPool)
+        poolBalance.save()
+      }
+    }
+  }
 }
 
 export function handleDeposit(event: DepositEvent): void {
@@ -100,12 +129,15 @@ export function handleDeposit(event: DepositEvent): void {
   let balance = Balance.load(event.params.user)
   if (user == null) {
     user = new User(event.params.user)
+    user.address = event.params.user
+    user.balances = event.params.user
     user.save()
   }
   if(balance == null){
     balance = new Balance(event.params.user)
     balance.user = event.params.user
     balance.availableUsdc = event.params.amount
+    balance.totalCollateralUsdc = BigInt.fromI32(0)
     balance.save()
   }else{
     balance.availableUsdc = balance.availableUsdc.plus(event.params.amount)
@@ -114,32 +146,45 @@ export function handleDeposit(event: DepositEvent): void {
 }
 
 export function handleFfrAdjust(event: FfrAdjustEvent): void {
-  // vamm.getLastFundingRateIndex()
+  let tradeBalance = TradeBalance.load(event.params.tradeId)
+  if(tradeBalance != null){
+    tradeBalance.collateral = tradeBalance.collateral.plus(event.params.amount)
+    tradeBalance.save()
+  }
+  let decodedTradeId = decodeTradeId(event.params.tradeId)
+  let poolBalance = PoolBalance.load(decodedTradeId[1])
+  if(poolBalance != null){
+    poolBalance.availableUsdc = poolBalance.availableUsdc.minus(event.params.amount)
+    poolBalance.totalUsdcSupply = poolBalance.totalUsdcSupply.minus(event.params.amount)
+    poolBalance.save()
+  }
 }
 
 export function handleLiquidated(event: LiquidatedEvent): void {
-  //jhejebje
+  let trade = Trade.load(event.params.tradeId)
+  if(trade != null){
+    trade.liquidated = true
+    trade.isActive = false
+    trade.save()
+  }
 }
 
 export function handleNewPosition(event: NewPositionEvent): void {
   let tradeId= event.params.tradeId
   let trade = new Trade(tradeId)
   trade.tradeId = event.params.tradeId
-  trade.vamm = event.params.amm
   trade.user = event.params.trader
-  trade.created = event.params.timeStamp
-  trade.isActive = true
   trade.ammPool = event.params.amm
+  trade.vamm = event.params.amm
+  trade.isActive = true
   trade.tradeBalance = tradeId
+  trade.created = event.params.timeStamp
+  trade.liquidated = false
   trade.save()
   let tradeBalance = new TradeBalance(tradeId)
   tradeBalance.tradeId = event.params.tradeId
   tradeBalance.LastInterestPayed = event.params.timeStamp
   tradeBalance.side = event.params.side
-
-  
- 
-  
   tradeBalance.save()
 }
 
@@ -152,7 +197,6 @@ export function handleOpenPosition(event: OpenPositionEvent): void {
     tradeBalance.collateral = event.params.collateral
     tradeBalance.leverage = event.params.loanAmt.div(event.params.collateral)
     tradeBalance.positionSize = event.params.positionSize
-
     let trade = Trade.load(event.params.tradeId)
     if(trade != null){
       let lp = LoanPool.load(trade.ammPool)
@@ -177,13 +221,9 @@ export function handleOpenPosition(event: OpenPositionEvent): void {
           }
           balance.save()
         }
-      }
-  
-      
+      }     
     }
     tradeBalance.save()
-
-    
   }
 }
 
@@ -238,9 +278,40 @@ export function handleRemoveCollateral(event: RemoveCollateralEvent): void {
 }
 
 export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
-  //trade
-  //tradeBalance
-  //balance
+  //
+  //tradeBalance: loanAmt positionSize
+  let tradeBalance = TradeBalance.load(event.params.tradeId)
+  if(tradeBalance != null){
+    tradeBalance.loanAmt = tradeBalance.loanAmt.minus(event.params.amountOwed)
+    tradeBalance.positionSize = tradeBalance.positionSize.minus(event.params.positionSizeRemoved)
+    if(tradeBalance.pnl != null){
+      tradeBalance.pnl = tradeBalance.pnl.plus(event.params.usdcReturned).minus(event.params.amountOwed)
+    }else{
+      tradeBalance.pnl = event.params.usdcReturned.minus(event.params.amountOwed)
+    }
+  //balance:  availableUsdc
+    let decodedTradeId = decodeTradeId(event.params.tradeId)
+    let user  = decodedTradeId[0]
+    let balance = Balance.load(user)
+    if(balance != null){
+      balance.availableUsdc = balance.availableUsdc.plus(event.params.usdcReturned).minus(event.params.amountOwed)
+      balance.save()
+    }
+  //poolBalance: totalusdcSupply availableUsdc
+  let amm = decodedTradeId[1]
+    let poolBal = PoolBalance.load(amm)
+    const pnl = event.params.usdcReturned.minus(event.params.amountOwed)
+    if(poolBal != null){
+      if(pnl > BigInt.fromI32(0)){
+      poolBal.availableUsdc = poolBal.availableUsdc.minus(pnl)
+      poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.minus(pnl)
+      }else{
+        tradeBalance.collateral = tradeBalance.collateral.minus(pnl)
+      }
+    poolBal.save()
+    }
+    tradeBalance.save()
+  }
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {

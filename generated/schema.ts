@@ -87,31 +87,6 @@ export class User extends Entity {
     }
   }
 
-  set stakes(value: Array<Bytes> | null) {
-    if (!value) {
-      this.unset("stakes");
-    } else {
-      this.set("stakes", Value.fromBytesArray(<Array<Bytes>>value));
-    }
-  }
-
-  get poolTokens(): Array<Bytes> | null {
-    let value = this.get("poolTokens");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytesArray();
-    }
-  }
-
-  set poolTokens(value: Array<Bytes> | null) {
-    if (!value) {
-      this.unset("poolTokens");
-    } else {
-      this.set("poolTokens", Value.fromBytesArray(<Array<Bytes>>value));
-    }
-  }
-
   get trades(): Array<Bytes> | null {
     let value = this.get("trades");
     if (!value || value.kind == ValueKind.NULL) {
@@ -265,6 +240,19 @@ export class Trade extends Entity {
 
   set isActive(value: boolean) {
     this.set("isActive", Value.fromBoolean(value));
+  }
+
+  get liquidated(): boolean {
+    let value = this.get("liquidated");
+    if (!value || value.kind == ValueKind.NULL) {
+      return false;
+    } else {
+      return value.toBoolean();
+    }
+  }
+
+  set liquidated(value: boolean) {
+    this.set("liquidated", Value.fromBoolean(value));
   }
 }
 
@@ -1077,160 +1065,208 @@ export class LoanPoolTheseus extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
-  get minMMR(): BigInt {
+  get minMMR(): BigInt | null {
     let value = this.get("minMMR");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set minMMR(value: BigInt) {
-    this.set("minMMR", Value.fromBigInt(value));
+  set minMMR(value: BigInt | null) {
+    if (!value) {
+      this.unset("minMMR");
+    } else {
+      this.set("minMMR", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get maxMMR(): BigInt {
+  get maxMMR(): BigInt | null {
     let value = this.get("maxMMR");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set maxMMR(value: BigInt) {
-    this.set("maxMMR", Value.fromBigInt(value));
+  set maxMMR(value: BigInt | null) {
+    if (!value) {
+      this.unset("maxMMR");
+    } else {
+      this.set("maxMMR", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get minInterestRate(): BigInt {
+  get minInterestRate(): BigInt | null {
     let value = this.get("minInterestRate");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set minInterestRate(value: BigInt) {
-    this.set("minInterestRate", Value.fromBigInt(value));
+  set minInterestRate(value: BigInt | null) {
+    if (!value) {
+      this.unset("minInterestRate");
+    } else {
+      this.set("minInterestRate", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get maxInterestRate(): BigInt {
+  get maxInterestRate(): BigInt | null {
     let value = this.get("maxInterestRate");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set maxInterestRate(value: BigInt) {
-    this.set("maxInterestRate", Value.fromBigInt(value));
+  set maxInterestRate(value: BigInt | null) {
+    if (!value) {
+      this.unset("maxInterestRate");
+    } else {
+      this.set("maxInterestRate", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get minTradingFee(): BigInt {
+  get minTradingFee(): BigInt | null {
     let value = this.get("minTradingFee");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set minTradingFee(value: BigInt) {
-    this.set("minTradingFee", Value.fromBigInt(value));
+  set minTradingFee(value: BigInt | null) {
+    if (!value) {
+      this.unset("minTradingFee");
+    } else {
+      this.set("minTradingFee", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get maxTradingFee(): BigInt {
+  get maxTradingFee(): BigInt | null {
     let value = this.get("maxTradingFee");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set maxTradingFee(value: BigInt) {
-    this.set("maxTradingFee", Value.fromBigInt(value));
+  set maxTradingFee(value: BigInt | null) {
+    if (!value) {
+      this.unset("maxTradingFee");
+    } else {
+      this.set("maxTradingFee", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get minLoan(): BigInt {
+  get minLoan(): BigInt | null {
     let value = this.get("minLoan");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set minLoan(value: BigInt) {
-    this.set("minLoan", Value.fromBigInt(value));
+  set minLoan(value: BigInt | null) {
+    if (!value) {
+      this.unset("minLoan");
+    } else {
+      this.set("minLoan", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get maxLoan(): BigInt {
+  get maxLoan(): BigInt | null {
     let value = this.get("maxLoan");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set maxLoan(value: BigInt) {
-    this.set("maxLoan", Value.fromBigInt(value));
+  set maxLoan(value: BigInt | null) {
+    if (!value) {
+      this.unset("maxLoan");
+    } else {
+      this.set("maxLoan", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get minHoldingsReqPercentage(): BigInt {
+  get minHoldingsReqPercentage(): BigInt | null {
     let value = this.get("minHoldingsReqPercentage");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set minHoldingsReqPercentage(value: BigInt) {
-    this.set("minHoldingsReqPercentage", Value.fromBigInt(value));
+  set minHoldingsReqPercentage(value: BigInt | null) {
+    if (!value) {
+      this.unset("minHoldingsReqPercentage");
+    } else {
+      this.set("minHoldingsReqPercentage", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get maxHoldingsReqPercentage(): BigInt {
+  get maxHoldingsReqPercentage(): BigInt | null {
     let value = this.get("maxHoldingsReqPercentage");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set maxHoldingsReqPercentage(value: BigInt) {
-    this.set("maxHoldingsReqPercentage", Value.fromBigInt(value));
+  set maxHoldingsReqPercentage(value: BigInt | null) {
+    if (!value) {
+      this.unset("maxHoldingsReqPercentage");
+    } else {
+      this.set("maxHoldingsReqPercentage", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get minInterestPeriod(): BigInt {
+  get minInterestPeriod(): BigInt | null {
     let value = this.get("minInterestPeriod");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set minInterestPeriod(value: BigInt) {
-    this.set("minInterestPeriod", Value.fromBigInt(value));
+  set minInterestPeriod(value: BigInt | null) {
+    if (!value) {
+      this.unset("minInterestPeriod");
+    } else {
+      this.set("minInterestPeriod", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get maxInterestPeriod(): BigInt {
+  get maxInterestPeriod(): BigInt | null {
     let value = this.get("maxInterestPeriod");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set maxInterestPeriod(value: BigInt) {
-    this.set("maxInterestPeriod", Value.fromBigInt(value));
+  set maxInterestPeriod(value: BigInt | null) {
+    if (!value) {
+      this.unset("maxInterestPeriod");
+    } else {
+      this.set("maxInterestPeriod", Value.fromBigInt(<BigInt>value));
+    }
   }
 
   get theseusDAO(): Bytes {
@@ -1394,19 +1430,6 @@ export class AriadneDAO extends Entity {
     this.set("poolToken", Value.fromBytes(value));
   }
 
-  get balances(): Array<Bytes> {
-    let value = this.get("balances");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
-  }
-
-  set balances(value: Array<Bytes>) {
-    this.set("balances", Value.fromBytesArray(value));
-  }
-
   get proposals(): Array<string> {
     let value = this.get("proposals");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1555,30 +1578,38 @@ export class Proposal extends Entity {
     this.set("data", Value.fromBytes(value));
   }
 
-  get result(): Bytes {
+  get result(): Bytes | null {
     let value = this.get("result");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBytes();
     }
   }
 
-  set result(value: Bytes) {
-    this.set("result", Value.fromBytes(value));
+  set result(value: Bytes | null) {
+    if (!value) {
+      this.unset("result");
+    } else {
+      this.set("result", Value.fromBytes(<Bytes>value));
+    }
   }
 
-  get executor(): Bytes {
+  get executor(): Bytes | null {
     let value = this.get("executor");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBytes();
     }
   }
 
-  set executor(value: Bytes) {
-    this.set("executor", Value.fromBytes(value));
+  set executor(value: Bytes | null) {
+    if (!value) {
+      this.unset("executor");
+    } else {
+      this.set("executor", Value.fromBytes(<Bytes>value));
+    }
   }
 
   get proposedAt(): BigInt {
@@ -1686,6 +1717,32 @@ export class Stakes extends Entity {
 
   set totalStaked(value: BigInt) {
     this.set("totalStaked", Value.fromBigInt(value));
+  }
+
+  get tokensOwnedbByUser(): BigInt {
+    let value = this.get("tokensOwnedbByUser");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set tokensOwnedbByUser(value: BigInt) {
+    this.set("tokensOwnedbByUser", Value.fromBigInt(value));
+  }
+
+  get ammPool(): Bytes {
+    let value = this.get("ammPool");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set ammPool(value: Bytes) {
+    this.set("ammPool", Value.fromBytes(value));
   }
 
   get token(): Bytes {
@@ -1804,185 +1861,6 @@ export class PoolToken extends Entity {
 
   set isFrozen(value: boolean) {
     this.set("isFrozen", Value.fromBoolean(value));
-  }
-}
-
-export class TokenBalance extends Entity {
-  constructor(id: Bytes) {
-    super();
-    this.set("id", Value.fromBytes(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id != null, "Cannot save TokenBalance entity without an ID");
-    if (id) {
-      assert(
-        id.kind == ValueKind.BYTES,
-        `Entities of type TokenBalance must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
-      );
-      store.set("TokenBalance", id.toBytes().toHexString(), this);
-    }
-  }
-
-  static loadInBlock(id: Bytes): TokenBalance | null {
-    return changetype<TokenBalance | null>(
-      store.get_in_block("TokenBalance", id.toHexString())
-    );
-  }
-
-  static load(id: Bytes): TokenBalance | null {
-    return changetype<TokenBalance | null>(
-      store.get("TokenBalance", id.toHexString())
-    );
-  }
-
-  get id(): Bytes {
-    let value = this.get("id");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set id(value: Bytes) {
-    this.set("id", Value.fromBytes(value));
-  }
-
-  get poolToken(): Bytes {
-    let value = this.get("poolToken");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set poolToken(value: Bytes) {
-    this.set("poolToken", Value.fromBytes(value));
-  }
-
-  get user(): Bytes {
-    let value = this.get("user");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set user(value: Bytes) {
-    this.set("user", Value.fromBytes(value));
-  }
-
-  get tokensOwnedbByUser(): BigInt {
-    let value = this.get("tokensOwnedbByUser");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set tokensOwnedbByUser(value: BigInt) {
-    this.set("tokensOwnedbByUser", Value.fromBigInt(value));
-  }
-
-  get stakeByPool(): Bytes {
-    let value = this.get("stakeByPool");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set stakeByPool(value: Bytes) {
-    this.set("stakeByPool", Value.fromBytes(value));
-  }
-}
-
-export class StakeByPool extends Entity {
-  constructor(id: Bytes) {
-    super();
-    this.set("id", Value.fromBytes(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id != null, "Cannot save StakeByPool entity without an ID");
-    if (id) {
-      assert(
-        id.kind == ValueKind.BYTES,
-        `Entities of type StakeByPool must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
-      );
-      store.set("StakeByPool", id.toBytes().toHexString(), this);
-    }
-  }
-
-  static loadInBlock(id: Bytes): StakeByPool | null {
-    return changetype<StakeByPool | null>(
-      store.get_in_block("StakeByPool", id.toHexString())
-    );
-  }
-
-  static load(id: Bytes): StakeByPool | null {
-    return changetype<StakeByPool | null>(
-      store.get("StakeByPool", id.toHexString())
-    );
-  }
-
-  get id(): Bytes {
-    let value = this.get("id");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set id(value: Bytes) {
-    this.set("id", Value.fromBytes(value));
-  }
-
-  get user(): Bytes {
-    let value = this.get("user");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set user(value: Bytes) {
-    this.set("user", Value.fromBytes(value));
-  }
-
-  get ammPool(): Bytes {
-    let value = this.get("ammPool");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set ammPool(value: Bytes) {
-    this.set("ammPool", Value.fromBytes(value));
-  }
-
-  get totalStaked(): BigInt {
-    let value = this.get("totalStaked");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set totalStaked(value: BigInt) {
-    this.set("totalStaked", Value.fromBigInt(value));
   }
 }
 

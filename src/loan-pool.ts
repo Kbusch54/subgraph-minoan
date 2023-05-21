@@ -1,3 +1,4 @@
+import { BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
   AddDebt as AddDebtEvent,
   BorrowAmount as BorrowAmountEvent,
@@ -18,330 +19,285 @@ import {
   PayDebt as PayDebtEvent,
   PayInterest as PayInterestEvent,
   RepayLoan as RepayLoanEvent,
-  TradingFeeSet as TradingFeeSetEvent
+  TradingFeeSet as TradingFeeSetEvent,
+  LoanPool as LoanPoolContract
 } from "../generated/LoanPool/LoanPool"
 import {
-  AddDebt,
-  BorrowAmount,
-  InterestPeriodsSet,
-  LoanInterestRateSet,
-  LoanPoolInitialized,
-  LoanPoolValues,
-  MMRSet,
-  MaxLoanSet,
-  MinAndMaxHoldingsReqPercentageSet,
-  MinAndMaxInterestPeriodsSet,
-  MinAndMaxInterestRateSet,
-  MinAndMaxLoanSet,
-  MinAndMaxMMRSet,
-  MinAndMaxTradingFeeSet,
-  MinHoldingsReqPercentageSet,
-  MinLoanSet,
-  PayDebt,
-  PayInterest,
-  RepayLoan,
-  TradingFeeSet
-} from "../generated/schema"
+  AriadneDAO,PriceData,
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stakes,TheseusDAO,Trade,TradeBalance,User,VAmm
+ } from "../generated/schema"
 
 export function handleAddDebt(event: AddDebtEvent): void {
-  let entity = new AddDebt(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.amm = event.params.amm
-  entity.amount = event.params.amount
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //debt: totalDebt
+  let debt = Debt.load(event.params.amm)
+  if (debt != null) {
+    debt.amountOwed = debt.amountOwed.plus(event.params.amount)
+  } else {
+    debt = new Debt(event.params.amm)
+    debt.amountOwed = event.params.amount
+    debt.loanPool = event.params.amm
+    let loanPool = LoanPool.load(event.params.amm)
+    if (loanPool != null) {
+      loanPool.debt = debt.id
+      loanPool.save()
+    }
+    debt.save()
+  }
+  let poolBalance = PoolBalance.load(event.params.amm)
+  if (poolBalance != null) {
+    poolBalance.totalUsdcSupply = poolBalance.outstandingLoanUsdc
+    poolBalance.availableUsdc = BigInt.fromI32(0)
+    poolBalance.save()
+  }
+  let loanPoolContract = LoanPoolContract.bind(event.address)
+  let balacne = Balance.load(loanPoolContract.theseusDao())
+  if (balacne != null) {
+    balacne.availableUsdc = balacne.availableUsdc.minus(event.params.amount)
+    balacne.save()
+  }
 }
 
 export function handleBorrowAmount(event: BorrowAmountEvent): void {
-  let entity = new BorrowAmount(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.amm = event.params.amm
-  entity.amount = event.params.amount
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //PoolBalance: poolOutstadingLoan poolAvailableBalance 
+  let poolBalance = PoolBalance.load(event.params.amm)
+  if (poolBalance != null) {
+    poolBalance.outstandingLoanUsdc = poolBalance.outstandingLoanUsdc.plus(event.params.amount)
+    poolBalance.availableUsdc = poolBalance.availableUsdc.minus(event.params.amount)
+  }
 }
 
 export function handleInterestPeriodsSet(event: InterestPeriodsSetEvent): void {
-  let entity = new InterestPeriodsSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._interestPeriods = event.params._interestPeriods
-  entity._ammPool = event.params._ammPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //LoanPool: interestPeriods
+  let loanPool = LoanPool.load(event.params._ammPool)
+  if (loanPool != null) {
+    loanPool.interestPeriod = event.params._interestPeriods
+    loanPool.save()
+  }
 }
 
 export function handleLoanInterestRateSet(
   event: LoanInterestRateSetEvent
 ): void {
-  let entity = new LoanInterestRateSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._loanInterestRate = event.params._loanInterestRate
-  entity._ammPool = event.params._ammPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //LoanPool: interestRate
+  let loanPool = LoanPool.load(event.params._ammPool)
+  if (loanPool != null) {
+    loanPool.interestRate = event.params._loanInterestRate
+    loanPool.save()
+  }
 }
 
 export function handleLoanPoolInitialized(
   event: LoanPoolInitializedEvent
 ): void {
-  let entity = new LoanPoolInitialized(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._ammPool = event.params._ammPool
-  entity._dao = event.params._dao
-  entity.timeStamp = event.params.timeStamp
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //LoanPool: newLoanPool
+  let loanPool = new LoanPool(event.params._ammPool)
+  loanPool.amm = event.params._ammPool
+  loanPool.created = event.params.timeStamp
+  loanPool.ariadneDAO = event.params._dao
+  loanPool.loanPoolTheseus = Bytes.fromHexString('1')
+  loanPool.save()
 }
 
 export function handleLoanPoolValues(event: LoanPoolValuesEvent): void {
-  let entity = new LoanPoolValues(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.ammPool = event.params.ammPool
-  entity.minLoan = event.params.minLoan
-  entity.maxLoan = event.params.maxLoan
-  entity.loanInterestRate = event.params.loanInterestRate
-  entity.loanInterestPeriod = event.params.loanInterestPeriod
-  entity.mmr = event.params.mmr
-  entity.minHoldingsReqPercentage = event.params.minHoldingsReqPercentage
-  entity.tradingFee = event.params.tradingFee
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //loanPool: newLoanPool
+  let loanPool = LoanPool.load(event.params.ammPool)
+  let poolBalance = new PoolBalance(event.params.ammPool)
+  poolBalance.amm = event.params.ammPool
+  poolBalance.totalUsdcSupply = BigInt.fromI32(0)
+  poolBalance.outstandingLoanUsdc = BigInt.fromI32(0)
+  poolBalance.availableUsdc = BigInt.fromI32(0)
+  poolBalance.loanPool = event.params.ammPool
+  poolBalance.save()
+  if(loanPool != null){
+    loanPool.minLoan = event.params.minLoan
+    loanPool.maxLoan = event.params.maxLoan
+    loanPool.interestRate = event.params.loanInterestRate
+    loanPool.interestPeriod = event.params.loanInterestPeriod
+    loanPool.mmr = event.params.mmr
+    loanPool.tradingFee = event.params.tradingFee
+    loanPool.minHoldingsReqPercentage = event.params.minHoldingsReqPercentage
+    loanPool.poolBalance = event.params.ammPool
+    loanPool.save()
+  }
 }
 
 export function handleMMRSet(event: MMRSetEvent): void {
-  let entity = new MMRSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._mmr = event.params._mmr
-  entity._ammPool = event.params._ammPool
+  //LoanPool: MMR
+  let loanPool = LoanPool.load(event.params._ammPool)
+  if(loanPool != null){
+    loanPool.mmr = event.params._mmr
+    loanPool.save()
+  }
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
 }
 
 export function handleMaxLoanSet(event: MaxLoanSetEvent): void {
-  let entity = new MaxLoanSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._maxLoan = event.params._maxLoan
-  entity._ammPool = event.params._ammPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //LoanPool: maxLoan
+  let loanPool = LoanPool.load(event.params._ammPool)
+  if(loanPool != null){
+    loanPool.maxLoan = event.params._maxLoan
+    loanPool.save()
+  }
 }
 
 export function handleMinAndMaxHoldingsReqPercentageSet(
   event: MinAndMaxHoldingsReqPercentageSetEvent
 ): void {
-  let entity = new MinAndMaxHoldingsReqPercentageSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._minHoldingsReqPercentage = event.params._minHoldingsReqPercentage
-  entity._maxHoldingsReqPercentage = event.params._maxHoldingsReqPercentage
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //TheseusLoanPool: minHoldingsReqPercentage
+  let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+  if(theseus == null){
+    let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+    theseus.minHoldingsReqPercentage = event.params._minHoldingsReqPercentage
+    theseus.save()
+  }else{
+    theseus.minHoldingsReqPercentage = event.params._minHoldingsReqPercentage
+    theseus.save()
+  }
 }
 
 export function handleMinAndMaxInterestPeriodsSet(
   event: MinAndMaxInterestPeriodsSetEvent
 ): void {
-  let entity = new MinAndMaxInterestPeriodsSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._minInterestPeriods = event.params._minInterestPeriods
-  entity._maxInterestPeriods = event.params._maxInterestPeriods
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //TheseusLoanPool: minInterestPeriods maxInterestPeriods
+  let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+  if(theseus == null){
+    let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+    theseus.minInterestPeriod = event.params._minInterestPeriods
+    theseus.maxInterestPeriod = event.params._maxInterestPeriods
+    theseus.save()
+  }else{
+    theseus.minInterestPeriod = event.params._minInterestPeriods
+    theseus.maxInterestPeriod = event.params._maxInterestPeriods
+    theseus.save()
+  }
 }
 
 export function handleMinAndMaxInterestRateSet(
   event: MinAndMaxInterestRateSetEvent
 ): void {
-  let entity = new MinAndMaxInterestRateSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._minInterestRate = event.params._minInterestRate
-  entity._maxInterestRate = event.params._maxInterestRate
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //TheseusLoanPool: minInterestRate maxInterestRate
+    //TheseusLoanPool: minInterestPeriods maxInterestPeriods
+    let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+    if(theseus == null){
+      let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+      theseus.minInterestRate = event.params._minInterestRate
+      theseus.maxInterestRate = event.params._maxInterestRate
+      theseus.save()
+    }else{
+      theseus.minInterestRate = event.params._minInterestRate
+      theseus.maxInterestRate = event.params._maxInterestRate
+      theseus.save()
+    }
 }
 
 export function handleMinAndMaxLoanSet(event: MinAndMaxLoanSetEvent): void {
-  let entity = new MinAndMaxLoanSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._minLoan = event.params._minLoan
-  entity._maxLoan = event.params._maxLoan
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //TheseusLoanPool: minLoan maxLoan
+  let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+  if(theseus == null){
+    let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+    theseus.minLoan = event.params._minLoan
+    theseus.maxLoan = event.params._maxLoan
+    theseus.save()
+  }else{
+    theseus.minLoan = event.params._minLoan
+    theseus.maxLoan = event.params._maxLoan
+    theseus.save()
+  }
 }
 
 export function handleMinAndMaxMMRSet(event: MinAndMaxMMRSetEvent): void {
-  let entity = new MinAndMaxMMRSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._minMMR = event.params._minMMR
-  entity._maxMMR = event.params._maxMMR
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //TheseusLoanPool: minMMR maxMMR
+  let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+  if(theseus == null){
+    let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+    theseus.minMMR = event.params._minMMR
+    theseus.maxMMR = event.params._maxMMR
+    theseus.save()
+  }else{
+    theseus.minMMR = event.params._minMMR
+    theseus.maxMMR = event.params._maxMMR
+    theseus.save()
+  }
 }
 
 export function handleMinAndMaxTradingFeeSet(
   event: MinAndMaxTradingFeeSetEvent
 ): void {
-  let entity = new MinAndMaxTradingFeeSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._minTradingFee = event.params._minTradingFee
-  entity._maxTradingFee = event.params._maxTradingFee
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //TheseusLoanPool: minTradingFee maxTradingFee
+  let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+  if(theseus == null){
+    let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+    theseus.minTradingFee = event.params._minTradingFee
+    theseus.maxTradingFee = event.params._maxTradingFee
+    theseus.save()
+  }else{
+    theseus.minTradingFee = event.params._minTradingFee
+    theseus.maxTradingFee = event.params._maxTradingFee
+    theseus.save()
+  }
 }
 
 export function handleMinHoldingsReqPercentageSet(
   event: MinHoldingsReqPercentageSetEvent
 ): void {
-  let entity = new MinHoldingsReqPercentageSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._minHoldingsReqPercentage = event.params._minHoldingsReqPercentage
-  entity._ammPool = event.params._ammPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //LoanPool: minHoldingsReqPercentage
+  let loanPool = LoanPool.load(event.params._ammPool)
+  if(loanPool != null){
+    loanPool.minHoldingsReqPercentage = event.params._minHoldingsReqPercentage
+    loanPool.save()
+  }
 }
 
 export function handleMinLoanSet(event: MinLoanSetEvent): void {
-  let entity = new MinLoanSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._minLoan = event.params._minLoan
-  entity._ammPool = event.params._ammPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //LoanPool: minLoan
+  let loanPool = LoanPool.load(event.params._ammPool)
+  if(loanPool != null){
+    loanPool.minLoan = event.params._minLoan
+    loanPool.save()
+  }
 }
 
 export function handlePayDebt(event: PayDebtEvent): void {
-  let entity = new PayDebt(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.amm = event.params.amm
-  entity.amount = event.params.amount
+  let debt = Debt.load(event.params.amm)
+  if (debt != null) {
+    debt.amountOwed = debt.amountOwed.minus(event.params.amount)
+  } 
+  let poolBalance = PoolBalance.load(event.params.amm)
+  if (poolBalance != null) {
+    poolBalance.totalUsdcSupply = poolBalance.outstandingLoanUsdc
+    poolBalance.availableUsdc = BigInt.fromI32(0)
+    poolBalance.save()
+  }
+  let loanPoolContract = LoanPoolContract.bind(event.address)
+  let balacne = Balance.load(loanPoolContract.theseusDao())
+  if (balacne != null) {
+    balacne.availableUsdc = balacne.availableUsdc.plus(event.params.amount)
+    balacne.save()
+  }
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
 }
 
 export function handlePayInterest(event: PayInterestEvent): void {
-  let entity = new PayInterest(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.lastPayed = event.params.lastPayed
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  let tradeBalanced = TradeBalance.load(event.params.tradeId)
+  if (tradeBalanced != null) {
+    tradeBalanced.LastInterestPayed = event.params.lastPayed
+    tradeBalanced.save()
+  }
 }
 
 export function handleRepayLoan(event: RepayLoanEvent): void {
-  let entity = new RepayLoan(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tradeId = event.params.tradeId
-  entity.amm = event.params.amm
-  entity.amount = event.params.amount
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  let poolBalance = PoolBalance.load(event.params.amm)
+  if (poolBalance != null) {
+    poolBalance.outstandingLoanUsdc = poolBalance.outstandingLoanUsdc.minus(event.params.amount)
+    poolBalance.availableUsdc = poolBalance.availableUsdc.plus(event.params.amount)
+  }
 }
 
 export function handleTradingFeeSet(event: TradingFeeSetEvent): void {
-  let entity = new TradingFeeSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._tradingFee = event.params._tradingFee
-  entity._ammPool = event.params._ammPool
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  //LoanPool: tradingFee
+  let loanPool = LoanPool.load(event.params._ammPool)
+  if(loanPool != null){
+    loanPool.tradingFee = event.params._tradingFee
+    loanPool.save()
+  }
 }

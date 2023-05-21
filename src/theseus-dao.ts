@@ -10,7 +10,7 @@ import {
 } from "../generated/TheseusDAO/TheseusDAO"
 import {
   AriadneDAO,PriceData,
-  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,StakeByPool,Stakes,TheseusDAO,TokenBalance,Trade,TradeBalance,User,VAmm
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stakes,TheseusDAO,Trade,TradeBalance,User,VAmm
  } from "../generated/schema"
 
 export function handleExecuteTransaction(event: ExecuteTransactionEvent): void {
