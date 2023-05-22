@@ -103,6 +103,14 @@ export function handleLoanPoolInitialized(
   loanPool.created = event.params.timeStamp
   loanPool.ariadneDAO = event.params._dao
   loanPool.loanPoolTheseus = Bytes.fromI32(1)
+  loanPool.minLoan = BigInt.fromI32(0)
+  loanPool.maxLoan = BigInt.fromI32(0)
+  loanPool.interestRate = BigInt.fromI32(0)
+  loanPool.interestPeriod = BigInt.fromI32(0)
+  loanPool.mmr = BigInt.fromI32(0)
+  loanPool.tradingFee = BigInt.fromI32(0)
+  loanPool.minHoldingsReqPercentage = BigInt.fromI32(0)
+  loanPool.poolBalance = event.params._ammPool
   loanPool.save()
 }
 

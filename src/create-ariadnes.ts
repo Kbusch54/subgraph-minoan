@@ -17,7 +17,7 @@ import {
 export function handleAriadneCreated(event: AriadneCreatedEvent): void {
   let entity = new AriadneDAO(event.params.contractAddress)
   entity.ammPool = event.params.ammAddress
-  entity.currentId = BigInt.zero()
+  entity.currentId = BigInt.fromI32(0)
 
 
   //calling conteract for variables
@@ -27,7 +27,7 @@ export function handleAriadneCreated(event: AriadneCreatedEvent): void {
   entity.minVotingPower = contract.minVotingPower()
   entity.votingTime = contract.votingTime()
   entity.tokenId = event.params.tokenId
-  entity.poolToken = Bytes.fromHexString(event.params.tokenId.toString())
+  entity.poolToken = event.params.ammAddress
   entity.save()
 }
 

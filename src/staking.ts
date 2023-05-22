@@ -14,7 +14,7 @@ import {
 
 export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
   //PoolToken: ammPool isFrozen tokenID totalSupply
-  let poolToken =  new PoolToken(Bytes.fromHexString(event.params.tokenId.toString()))
+  let poolToken =  new PoolToken(event.params.ammPool)
   poolToken.tokenId = event.params.tokenId
   poolToken.totalSupply = BigInt.fromI32(0)
   poolToken.ammPool = event.params.ammPool
@@ -24,7 +24,7 @@ export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
 export function handleFrozenStake(event: FrozenStakeEvent): void {
   let stakingContract = StakingContract.bind(event.address)
   let tokenId = stakingContract.ammPoolToTokenId(event.params.ammPool)
- let poolToken = PoolToken.load(Bytes.fromHexString(tokenId.toString()))
+ let poolToken = PoolToken.load(event.params.ammPool)
   if(poolToken !== null){
     poolToken.isFrozen = true
     poolToken.save()
@@ -52,7 +52,7 @@ export function handleStake(event: StakeEvent): void {
   stake.totalStaked = stake.totalStaked.plus(event.params.usdcAmount)
   stake.save()
   //poolToken: totalSupply 
-  let poolToken = PoolToken.load(Bytes.fromHexString(event.params.tokenId.toString()))
+  let poolToken = PoolToken.load(event.params.ammPool)
   if (poolToken !== null) {
     poolToken.totalSupply = poolToken.totalSupply.plus(event.params.tokensMinted)
     poolToken.save()
@@ -69,7 +69,7 @@ export function handleStake(event: StakeEvent): void {
 export function handleUnFrozenStake(event: UnFrozenStakeEvent): void {
   let stakingContract = StakingContract.bind(event.address)
   let tokenId = stakingContract.ammPoolToTokenId(event.params.ammPool)
-  let poolToken = PoolToken.load(Bytes.fromHexString(tokenId.toString()))
+  let poolToken = PoolToken.load(Bytes.fromHexString(tokenId.toHexString()))
   if(poolToken !== null){
     poolToken.isFrozen = false
     poolToken.save()
@@ -84,7 +84,7 @@ export function handleUnstake(event: UnstakeEvent): void {
     balance.save()
   }
   //poolToken: totalSupply 
-  let poolToken = PoolToken.load(Bytes.fromHexString(event.params.tokenId.toString()))
+  let poolToken = PoolToken.load(event.params.ammPool)
   if (poolToken !== null) {
     poolToken.totalSupply = poolToken.totalSupply.minus(event.params.tokensBurned)
     poolToken.save()
