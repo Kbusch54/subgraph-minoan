@@ -1,4 +1,4 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts"
+import { BigInt, ByteArray, Bytes } from "@graphprotocol/graph-ts"
 import {
   AddTokenToPool as AddTokenToPoolEvent,
   FrozenStake as FrozenStakeEvent,
@@ -14,16 +14,16 @@ import {
 
 export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
   //PoolToken: ammPool isFrozen tokenID totalSupply
-  let poolToken =  new PoolToken(event.params.ammPool)
+  
+  let poolToken = new PoolToken(event.params.ammPool)
   poolToken.tokenId = event.params.tokenId
   poolToken.totalSupply = BigInt.fromI32(0)
   poolToken.ammPool = event.params.ammPool
   poolToken.isFrozen = false
+  poolToken.save()
 }
 
 export function handleFrozenStake(event: FrozenStakeEvent): void {
-  let stakingContract = StakingContract.bind(event.address)
-  let tokenId = stakingContract.ammPoolToTokenId(event.params.ammPool)
  let poolToken = PoolToken.load(event.params.ammPool)
   if(poolToken !== null){
     poolToken.isFrozen = true
@@ -39,14 +39,15 @@ export function handleStake(event: StakeEvent): void {
     balance.save()
   }
   //tokenBalance: tokensOwnedByUser
-  let stake = Stakes.load(Bytes.fromHexString(event.params.user.toString().concat("-").concat(event.params.tokenId.toString())))
+  let stake = Stakes.load(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
   if (stake == null) {
-    stake = new Stakes(Bytes.fromHexString(event.params.user.toString().concat("-").concat(event.params.tokenId.toString())))
+    stake = new Stakes(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
     stake.user = event.params.user
-    stake.token = Bytes.fromHexString(event.params.tokenId.toString())
+    stake.token = event.params.ammPool
     stake.tokensOwnedbByUser = BigInt.fromI32(0)
     stake.ammPool = event.params.ammPool
     stake.totalStaked = BigInt.fromI32(0)
+    stake.save()
   }
   stake.tokensOwnedbByUser = stake.tokensOwnedbByUser.plus(event.params.tokensMinted)
   stake.totalStaked = stake.totalStaked.plus(event.params.usdcAmount)
@@ -69,7 +70,7 @@ export function handleStake(event: StakeEvent): void {
 export function handleUnFrozenStake(event: UnFrozenStakeEvent): void {
   let stakingContract = StakingContract.bind(event.address)
   let tokenId = stakingContract.ammPoolToTokenId(event.params.ammPool)
-  let poolToken = PoolToken.load(Bytes.fromHexString(tokenId.toHexString()))
+  let poolToken = PoolToken.load(event.params.ammPool)
   if(poolToken !== null){
     poolToken.isFrozen = false
     poolToken.save()
@@ -90,7 +91,7 @@ export function handleUnstake(event: UnstakeEvent): void {
     poolToken.save()
   }
   // stakes: totalStaked 
-  let stakes = Stakes.load(Bytes.fromHexString(event.params.user.toString().concat("-").concat(event.params.tokenId.toString())))
+  let stakes = Stakes.load(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
   if (stakes !== null) {
     stakes.totalStaked = stakes.totalStaked.minus(event.params.usdcAmount)
     stakes.tokensOwnedbByUser = stakes.tokensOwnedbByUser.minus(event.params.tokensBurned)

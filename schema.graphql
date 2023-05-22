@@ -51,6 +51,7 @@ type LoanPool @entity{
   poolBalance: PoolBalance # PoolBalance
   trades: [Trade!]@derivedFrom(field:"ammPool") # Trade[]
   debt: Debt # Debt
+  poolToken: PoolToken # PoolToken
   loanPoolTheseus: LoanPoolTheseus # LoanPoolTheseus
 }
 type PoolBalance @entity{
@@ -129,7 +130,7 @@ type Stakes @entity{
   token: PoolToken! # PoolToken!
 }
 type PoolToken @entity{
-  id:Bytes! # poolTokenId
+  id:Bytes! # ammPool
   tokenId: BigInt! # uint256
   totalSupply: BigInt! # uint256
   tokenBalance: [Stakes!] @derivedFrom(field: "token")

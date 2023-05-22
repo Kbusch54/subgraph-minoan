@@ -111,6 +111,7 @@ export function handleLoanPoolInitialized(
   loanPool.tradingFee = BigInt.fromI32(0)
   loanPool.minHoldingsReqPercentage = BigInt.fromI32(0)
   loanPool.poolBalance = event.params._ammPool
+  loanPool.poolToken = event.params._ammPool
   loanPool.save()
 }
 

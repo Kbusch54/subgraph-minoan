@@ -152,7 +152,7 @@ export function handleFfrAdjust(event: FfrAdjustEvent): void {
     tradeBalance.collateral = tradeBalance.collateral.plus(event.params.amount)
     tradeBalance.save()
   }
-  let poolBalance = PoolBalance.load(Bytes.fromHexString(event.params.tradeId.slice(0, 20).toString()))
+  let poolBalance = PoolBalance.load(Bytes.fromUTF8(event.params.tradeId.slice(0, 20).toString()))
   if(poolBalance !== null){
     poolBalance.availableUsdc = poolBalance.availableUsdc.minus(event.params.amount)
     poolBalance.totalUsdcSupply = poolBalance.totalUsdcSupply.minus(event.params.amount)
@@ -233,8 +233,8 @@ export function handlePayInterest(event: PayInterestEvent): void {
     tradeBalance.collateral = tradeBalance.collateral.minus(event.params.totalAmount)
   }
   let decodedTradeId = event.params.tradeId
-  let user  = Bytes.fromHexString(decodedTradeId.slice(0, 20).toString())
-  let amm = Bytes.fromHexString(decodedTradeId.slice(20, 40).toString())
+  let user  = Bytes.fromUTF8(decodedTradeId.slice(0, 20).toString())
+  let amm = Bytes.fromUTF8(decodedTradeId.slice(20, 40).toString())
   let balance = Balance.load(user)
   if(balance !== null){
     balance.totalCollateralUsdc = balance.totalCollateralUsdc.minus(event.params.totalAmount)
@@ -291,14 +291,14 @@ export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
     }
   //balance:  availableUsdc
     let decodedTradeId = event.params.tradeId
-    let user  =  Bytes.fromHexString(decodedTradeId.slice(0, 20).toString());
+    let user  =  Bytes.fromUTF8(decodedTradeId.slice(0, 20).toString());
     let balance = Balance.load(user)
     if(balance !== null){
       balance.availableUsdc = balance.availableUsdc.plus(event.params.usdcReturned).minus(event.params.amountOwed)
       balance.save()
     }
   //poolBalance: totalusdcSupply availableUsdc
-  let amm = Bytes.fromHexString(decodedTradeId.slice(20, 40).toString());
+  let amm = Bytes.fromUTF8(decodedTradeId.slice(20, 40).toString());
     let poolBal = PoolBalance.load(amm)
     const pnl = event.params.usdcReturned.minus(event.params.amountOwed)
     if(poolBal !== null){

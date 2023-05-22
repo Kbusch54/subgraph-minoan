@@ -691,6 +691,23 @@ export class LoanPool extends Entity {
     }
   }
 
+  get poolToken(): Bytes | null {
+    let value = this.get("poolToken");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set poolToken(value: Bytes | null) {
+    if (!value) {
+      this.unset("poolToken");
+    } else {
+      this.set("poolToken", Value.fromBytes(<Bytes>value));
+    }
+  }
+
   get loanPoolTheseus(): Bytes | null {
     let value = this.get("loanPoolTheseus");
     if (!value || value.kind == ValueKind.NULL) {
