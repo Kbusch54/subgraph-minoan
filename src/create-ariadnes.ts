@@ -27,7 +27,7 @@ export function handleAriadneCreated(event: AriadneCreatedEvent): void {
   entity.minVotingPower = contract.minVotingPower()
   entity.votingTime = contract.votingTime()
   entity.tokenId = event.params.tokenId
-  entity.poolToken = Bytes.fromBigInt(event.params.tokenId)
+  entity.poolToken = Bytes.fromHexString(event.params.tokenId.toString())
   entity.save()
 }
 

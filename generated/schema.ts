@@ -463,21 +463,17 @@ export class TradeBalance extends Entity {
     }
   }
 
-  get pnl(): BigInt | null {
+  get pnl(): BigInt {
     let value = this.get("pnl");
     if (!value || value.kind == ValueKind.NULL) {
-      return null;
+      throw new Error("Cannot return null for a required field.");
     } else {
       return value.toBigInt();
     }
   }
 
-  set pnl(value: BigInt | null) {
-    if (!value) {
-      this.unset("pnl");
-    } else {
-      this.set("pnl", Value.fromBigInt(<BigInt>value));
-    }
+  set pnl(value: BigInt) {
+    this.set("pnl", Value.fromBigInt(value));
   }
 }
 

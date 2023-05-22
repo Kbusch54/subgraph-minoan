@@ -1,4 +1,4 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts"
+import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
   AddDebt as AddDebtEvent,
   BorrowAmount as BorrowAmountEvent,
@@ -20,6 +20,7 @@ import {
   PayInterest as PayInterestEvent,
   RepayLoan as RepayLoanEvent,
   TradingFeeSet as TradingFeeSetEvent,
+  UpdateTheseus as UpdateTheseusEvent,
   LoanPool as LoanPoolContract
 } from "../generated/LoanPool/LoanPool"
 import {
@@ -30,37 +31,44 @@ import {
 export function handleAddDebt(event: AddDebtEvent): void {
   //debt: totalDebt
   let debt = Debt.load(event.params.amm)
-  if (debt != null) {
+  if (debt !== null) {
     debt.amountOwed = debt.amountOwed.plus(event.params.amount)
   } else {
     debt = new Debt(event.params.amm)
     debt.amountOwed = event.params.amount
     debt.loanPool = event.params.amm
     let loanPool = LoanPool.load(event.params.amm)
-    if (loanPool != null) {
+    if (loanPool !== null) {
       loanPool.debt = debt.id
       loanPool.save()
     }
     debt.save()
   }
   let poolBalance = PoolBalance.load(event.params.amm)
-  if (poolBalance != null) {
+  if (poolBalance !== null) {
     poolBalance.totalUsdcSupply = poolBalance.outstandingLoanUsdc
     poolBalance.availableUsdc = BigInt.fromI32(0)
     poolBalance.save()
   }
   let loanPoolContract = LoanPoolContract.bind(event.address)
   let balacne = Balance.load(loanPoolContract.theseusDao())
-  if (balacne != null) {
+  if (balacne !== null) {
     balacne.availableUsdc = balacne.availableUsdc.minus(event.params.amount)
     balacne.save()
+  }
+}
+
+export function handleUpdateTheseus(event: UpdateTheseusEvent): void {
+  let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
+  if (theseus !== null) {
+    theseus.theseusDAO = event.params.newTheseus
   }
 }
 
 export function handleBorrowAmount(event: BorrowAmountEvent): void {
   //PoolBalance: poolOutstadingLoan poolAvailableBalance 
   let poolBalance = PoolBalance.load(event.params.amm)
-  if (poolBalance != null) {
+  if (poolBalance !== null) {
     poolBalance.outstandingLoanUsdc = poolBalance.outstandingLoanUsdc.plus(event.params.amount)
     poolBalance.availableUsdc = poolBalance.availableUsdc.minus(event.params.amount)
   }
@@ -69,7 +77,7 @@ export function handleBorrowAmount(event: BorrowAmountEvent): void {
 export function handleInterestPeriodsSet(event: InterestPeriodsSetEvent): void {
   //LoanPool: interestPeriods
   let loanPool = LoanPool.load(event.params._ammPool)
-  if (loanPool != null) {
+  if (loanPool !== null) {
     loanPool.interestPeriod = event.params._interestPeriods
     loanPool.save()
   }
@@ -80,7 +88,7 @@ export function handleLoanInterestRateSet(
 ): void {
   //LoanPool: interestRate
   let loanPool = LoanPool.load(event.params._ammPool)
-  if (loanPool != null) {
+  if (loanPool !== null) {
     loanPool.interestRate = event.params._loanInterestRate
     loanPool.save()
   }
@@ -94,7 +102,7 @@ export function handleLoanPoolInitialized(
   loanPool.amm = event.params._ammPool
   loanPool.created = event.params.timeStamp
   loanPool.ariadneDAO = event.params._dao
-  loanPool.loanPoolTheseus = Bytes.fromHexString('1')
+  loanPool.loanPoolTheseus = Bytes.fromI32(1)
   loanPool.save()
 }
 
@@ -108,7 +116,7 @@ export function handleLoanPoolValues(event: LoanPoolValuesEvent): void {
   poolBalance.availableUsdc = BigInt.fromI32(0)
   poolBalance.loanPool = event.params.ammPool
   poolBalance.save()
-  if(loanPool != null){
+  if(loanPool !== null){
     loanPool.minLoan = event.params.minLoan
     loanPool.maxLoan = event.params.maxLoan
     loanPool.interestRate = event.params.loanInterestRate
@@ -124,7 +132,7 @@ export function handleLoanPoolValues(event: LoanPoolValuesEvent): void {
 export function handleMMRSet(event: MMRSetEvent): void {
   //LoanPool: MMR
   let loanPool = LoanPool.load(event.params._ammPool)
-  if(loanPool != null){
+  if(loanPool !== null){
     loanPool.mmr = event.params._mmr
     loanPool.save()
   }
@@ -134,7 +142,7 @@ export function handleMMRSet(event: MMRSetEvent): void {
 export function handleMaxLoanSet(event: MaxLoanSetEvent): void {
   //LoanPool: maxLoan
   let loanPool = LoanPool.load(event.params._ammPool)
-  if(loanPool != null){
+  if(loanPool !== null){
     loanPool.maxLoan = event.params._maxLoan
     loanPool.save()
   }
@@ -144,9 +152,10 @@ export function handleMinAndMaxHoldingsReqPercentageSet(
   event: MinAndMaxHoldingsReqPercentageSetEvent
 ): void {
   //TheseusLoanPool: minHoldingsReqPercentage
-  let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+  let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
-    let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+    let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
+    theseus.theseusDAO =  Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C') 
     theseus.minHoldingsReqPercentage = event.params._minHoldingsReqPercentage
     theseus.save()
   }else{
@@ -159,9 +168,10 @@ export function handleMinAndMaxInterestPeriodsSet(
   event: MinAndMaxInterestPeriodsSetEvent
 ): void {
   //TheseusLoanPool: minInterestPeriods maxInterestPeriods
-  let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+  let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
-    let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+    let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
+    theseus.theseusDAO = Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C') 
     theseus.minInterestPeriod = event.params._minInterestPeriods
     theseus.maxInterestPeriod = event.params._maxInterestPeriods
     theseus.save()
@@ -177,9 +187,10 @@ export function handleMinAndMaxInterestRateSet(
 ): void {
   //TheseusLoanPool: minInterestRate maxInterestRate
     //TheseusLoanPool: minInterestPeriods maxInterestPeriods
-    let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+    let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
     if(theseus == null){
-      let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+      let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
+      theseus.theseusDAO = Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C') 
       theseus.minInterestRate = event.params._minInterestRate
       theseus.maxInterestRate = event.params._maxInterestRate
       theseus.save()
@@ -192,9 +203,10 @@ export function handleMinAndMaxInterestRateSet(
 
 export function handleMinAndMaxLoanSet(event: MinAndMaxLoanSetEvent): void {
   //TheseusLoanPool: minLoan maxLoan
-  let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+  let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
-    let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+    let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
+    theseus.theseusDAO = Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C') 
     theseus.minLoan = event.params._minLoan
     theseus.maxLoan = event.params._maxLoan
     theseus.save()
@@ -207,9 +219,10 @@ export function handleMinAndMaxLoanSet(event: MinAndMaxLoanSetEvent): void {
 
 export function handleMinAndMaxMMRSet(event: MinAndMaxMMRSetEvent): void {
   //TheseusLoanPool: minMMR maxMMR
-  let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+  let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
-    let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+    let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
+    theseus.theseusDAO = Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C') 
     theseus.minMMR = event.params._minMMR
     theseus.maxMMR = event.params._maxMMR
     theseus.save()
@@ -224,9 +237,10 @@ export function handleMinAndMaxTradingFeeSet(
   event: MinAndMaxTradingFeeSetEvent
 ): void {
   //TheseusLoanPool: minTradingFee maxTradingFee
-  let theseus = LoanPoolTheseus.load(Bytes.fromHexString('1'))
+  let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
-    let theseus = new LoanPoolTheseus(Bytes.fromHexString('1'))
+    let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
+    theseus.theseusDAO = Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C') 
     theseus.minTradingFee = event.params._minTradingFee
     theseus.maxTradingFee = event.params._maxTradingFee
     theseus.save()
@@ -242,7 +256,7 @@ export function handleMinHoldingsReqPercentageSet(
 ): void {
   //LoanPool: minHoldingsReqPercentage
   let loanPool = LoanPool.load(event.params._ammPool)
-  if(loanPool != null){
+  if(loanPool !== null){
     loanPool.minHoldingsReqPercentage = event.params._minHoldingsReqPercentage
     loanPool.save()
   }
@@ -251,7 +265,7 @@ export function handleMinHoldingsReqPercentageSet(
 export function handleMinLoanSet(event: MinLoanSetEvent): void {
   //LoanPool: minLoan
   let loanPool = LoanPool.load(event.params._ammPool)
-  if(loanPool != null){
+  if(loanPool !== null){
     loanPool.minLoan = event.params._minLoan
     loanPool.save()
   }
@@ -259,18 +273,18 @@ export function handleMinLoanSet(event: MinLoanSetEvent): void {
 
 export function handlePayDebt(event: PayDebtEvent): void {
   let debt = Debt.load(event.params.amm)
-  if (debt != null) {
+  if (debt !== null) {
     debt.amountOwed = debt.amountOwed.minus(event.params.amount)
   } 
   let poolBalance = PoolBalance.load(event.params.amm)
-  if (poolBalance != null) {
+  if (poolBalance !== null) {
     poolBalance.totalUsdcSupply = poolBalance.outstandingLoanUsdc
     poolBalance.availableUsdc = BigInt.fromI32(0)
     poolBalance.save()
   }
   let loanPoolContract = LoanPoolContract.bind(event.address)
   let balacne = Balance.load(loanPoolContract.theseusDao())
-  if (balacne != null) {
+  if (balacne !== null) {
     balacne.availableUsdc = balacne.availableUsdc.plus(event.params.amount)
     balacne.save()
   }
@@ -279,7 +293,7 @@ export function handlePayDebt(event: PayDebtEvent): void {
 
 export function handlePayInterest(event: PayInterestEvent): void {
   let tradeBalanced = TradeBalance.load(event.params.tradeId)
-  if (tradeBalanced != null) {
+  if (tradeBalanced !== null) {
     tradeBalanced.LastInterestPayed = event.params.lastPayed
     tradeBalanced.save()
   }
@@ -287,7 +301,7 @@ export function handlePayInterest(event: PayInterestEvent): void {
 
 export function handleRepayLoan(event: RepayLoanEvent): void {
   let poolBalance = PoolBalance.load(event.params.amm)
-  if (poolBalance != null) {
+  if (poolBalance !== null) {
     poolBalance.outstandingLoanUsdc = poolBalance.outstandingLoanUsdc.minus(event.params.amount)
     poolBalance.availableUsdc = poolBalance.availableUsdc.plus(event.params.amount)
   }
@@ -296,7 +310,7 @@ export function handleRepayLoan(event: RepayLoanEvent): void {
 export function handleTradingFeeSet(event: TradingFeeSetEvent): void {
   //LoanPool: tradingFee
   let loanPool = LoanPool.load(event.params._ammPool)
-  if(loanPool != null){
+  if(loanPool !== null){
     loanPool.tradingFee = event.params._tradingFee
     loanPool.save()
   }
