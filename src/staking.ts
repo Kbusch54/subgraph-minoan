@@ -9,7 +9,7 @@ import {
 } from "../generated/Staking/Staking"
 import {
   AriadneDAO,PriceData,
-  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stakes,TheseusDAO,Trade,TradeBalance,User,VAmm
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stake,TheseusDAO,Trade,TradeBalance,User,VAmm
  } from "../generated/schema"
 
 export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
@@ -39,13 +39,18 @@ export function handleStake(event: StakeEvent): void {
     balance.save()
   }
   //tokenBalance: tokensOwnedByUser
-  let stake = Stakes.load(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
+  let stake = Stake.load(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
   if (stake == null) {
-    stake = new Stakes(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
+    stake = new Stake(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
     stake.user = event.params.user
+    const tokenId = event.params.tokenId
     stake.token = event.params.ammPool
     stake.tokensOwnedbByUser = BigInt.fromI32(0)
-    stake.ammPool = event.params.ammPool
+    if(tokenId == BigInt.fromI32(0)){
+      stake.theseusDAO = event.params.ammPool
+    }else{
+      stake.ammPool = event.params.ammPool
+    }
     stake.totalStaked = BigInt.fromI32(0)
     stake.save()
   }
@@ -91,7 +96,7 @@ export function handleUnstake(event: UnstakeEvent): void {
     poolToken.save()
   }
   // stakes: totalStaked 
-  let stakes = Stakes.load(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
+  let stakes = Stake.load(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
   if (stakes !== null) {
     stakes.totalStaked = stakes.totalStaked.minus(event.params.usdcAmount)
     stakes.tokensOwnedbByUser = stakes.tokensOwnedbByUser.minus(event.params.tokensBurned)

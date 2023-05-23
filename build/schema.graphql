@@ -4,7 +4,7 @@ type User @entity {
   id: Bytes!
   address: Bytes! # address!
   balances: Balance! # Balance
-  stakes: [Stakes!]@derivedFrom(field:"user") # Stakes[]
+  stakes: [Stake!]@derivedFrom(field:"user") # Stake[]
   trades: [Trade!]@derivedFrom(field:"user") # Trade[]
 }
 type Trade @entity{
@@ -49,10 +49,11 @@ type LoanPool @entity{
   minHoldingsReqPercentage: BigInt! # uint256
   tradingFee: BigInt! # uint256
   poolBalance: PoolBalance # PoolBalance
-  trades: [Trade!]@derivedFrom(field:"ammPool") # Trade[]
+  trades: [Trade!]@derivedFrom(field: "ammPool") # Trade[]
   debt: Debt # Debt
   poolToken: PoolToken # PoolToken
   loanPoolTheseus: LoanPoolTheseus # LoanPoolTheseus
+  stakes: [Stake!]!@derivedFrom(field: "ammPool") # Stake[]
 }
 type PoolBalance @entity{
   id:Bytes! #ammAddress
@@ -64,7 +65,6 @@ type PoolBalance @entity{
 }
 type TheseusDAO @entity{
   id:Bytes! 
-  stakes: [Stakes!]! # Stakes[]
   proposals: [Proposal!]! # Proposal[]@derivedFrom(field: "theseusDAO")
   poolTokens: [PoolToken!]! # PoolToken[]
   currentId: BigInt! # uint256
@@ -76,6 +76,7 @@ type TheseusDAO @entity{
   insuranceFundMin: BigInt! # uint256
   loanPoolTheseus: LoanPoolTheseus! # LoanPoolTheseus
   balances: [Balance!]! # Balance[]
+  stakes: [Stake!]!@derivedFrom(field: "theseusDAO") # Stake[]
 }
 type LoanPoolTheseus @entity{
   id:Bytes! #num 1
@@ -121,19 +122,20 @@ type Proposal @entity{
   isPassed: Boolean! # bool
 }
 
-type Stakes @entity{
+type Stake @entity{
   id:Bytes! # userAddresss +poolTokenId
   user: User! # address!
   totalStaked: BigInt! # uint256 usdc
   tokensOwnedbByUser: BigInt! # uint256 numOfPoolTokens
-  ammPool: LoanPool! # address!
+  ammPool: LoanPool # address!
+  theseusDAO: TheseusDAO # address!
   token: PoolToken! # PoolToken!
 }
 type PoolToken @entity{
   id:Bytes! # ammPool
   tokenId: BigInt! # uint256
   totalSupply: BigInt! # uint256
-  tokenBalance: [Stakes!] @derivedFrom(field: "token")
+  tokenBalance: [Stake!] @derivedFrom(field: "token")
   ammPool: LoanPool! # address!
   isFrozen: Boolean! # bool
 }

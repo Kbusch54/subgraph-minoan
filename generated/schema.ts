@@ -724,6 +724,15 @@ export class LoanPool extends Entity {
       this.set("loanPoolTheseus", Value.fromBytes(<Bytes>value));
     }
   }
+
+  get stakes(): Array<Bytes> {
+    let value = this.get("stakes");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytesArray();
+    }
+  }
 }
 
 export class PoolBalance extends Entity {
@@ -878,19 +887,6 @@ export class TheseusDAO extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
-  get stakes(): Array<Bytes> {
-    let value = this.get("stakes");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
-  }
-
-  set stakes(value: Array<Bytes>) {
-    this.set("stakes", Value.fromBytesArray(value));
-  }
-
   get proposals(): Array<string> {
     let value = this.get("proposals");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1032,6 +1028,15 @@ export class TheseusDAO extends Entity {
 
   set balances(value: Array<Bytes>) {
     this.set("balances", Value.fromBytesArray(value));
+  }
+
+  get stakes(): Array<Bytes> {
+    let value = this.get("stakes");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytesArray();
+    }
   }
 }
 
@@ -1665,7 +1670,7 @@ export class Proposal extends Entity {
   }
 }
 
-export class Stakes extends Entity {
+export class Stake extends Entity {
   constructor(id: Bytes) {
     super();
     this.set("id", Value.fromBytes(id));
@@ -1673,24 +1678,24 @@ export class Stakes extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save Stakes entity without an ID");
+    assert(id != null, "Cannot save Stake entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.BYTES,
-        `Entities of type Stakes must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type Stake must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
       );
-      store.set("Stakes", id.toBytes().toHexString(), this);
+      store.set("Stake", id.toBytes().toHexString(), this);
     }
   }
 
-  static loadInBlock(id: Bytes): Stakes | null {
-    return changetype<Stakes | null>(
-      store.get_in_block("Stakes", id.toHexString())
+  static loadInBlock(id: Bytes): Stake | null {
+    return changetype<Stake | null>(
+      store.get_in_block("Stake", id.toHexString())
     );
   }
 
-  static load(id: Bytes): Stakes | null {
-    return changetype<Stakes | null>(store.get("Stakes", id.toHexString()));
+  static load(id: Bytes): Stake | null {
+    return changetype<Stake | null>(store.get("Stake", id.toHexString()));
   }
 
   get id(): Bytes {
@@ -1745,17 +1750,38 @@ export class Stakes extends Entity {
     this.set("tokensOwnedbByUser", Value.fromBigInt(value));
   }
 
-  get ammPool(): Bytes {
+  get ammPool(): Bytes | null {
     let value = this.get("ammPool");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBytes();
     }
   }
 
-  set ammPool(value: Bytes) {
-    this.set("ammPool", Value.fromBytes(value));
+  set ammPool(value: Bytes | null) {
+    if (!value) {
+      this.unset("ammPool");
+    } else {
+      this.set("ammPool", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get theseusDAO(): Bytes | null {
+    let value = this.get("theseusDAO");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set theseusDAO(value: Bytes | null) {
+    if (!value) {
+      this.unset("theseusDAO");
+    } else {
+      this.set("theseusDAO", Value.fromBytes(<Bytes>value));
+    }
   }
 
   get token(): Bytes {
