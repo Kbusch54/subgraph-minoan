@@ -24,7 +24,6 @@ import {
   LoanPool as LoanPoolContract,
   
 } from "../generated/LoanPool/LoanPool"
-import {TheseusDAO as TheseusDAOContract} from "../generated/TheseusDAO/TheseusDAO"
 import {
   AriadneDAO,PriceData,
   Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stake,TheseusDAO,Trade,TradeBalance,User,VAmm
@@ -173,19 +172,7 @@ export function handleMinAndMaxHoldingsReqPercentageSet(
     theseus.minHoldingsReqPercentage = event.params._minHoldingsReqPercentage
     theseus.save()
   }
-  let theseusDAO = TheseusDAO.load(Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C'))
-  if(theseusDAO == null){
-    let theseusDAO = new TheseusDAO(Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C'))
-    theseusDAO.currentId = BigInt.fromI32(0)
-    theseusDAO.tokenId = BigInt.fromI32(0)
-    let theCon = TheseusDAOContract.bind(Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C'))
-    theseusDAO.votesNeededPercentage = theCon.votesNeededPercentage();
-    theseusDAO.insuranceFundMin = theCon.insuranceFundMin();
-    theseusDAO.maxVotingPower = theCon.maxVotingPower();
-    theseusDAO.minVotingPower = theCon.minVotingPower();
-    theseusDAO.votingTime = theCon.votingTime();
-    theseusDAO.save()
-  }
+  
 }
 
 export function handleMinAndMaxInterestPeriodsSet(
@@ -223,6 +210,7 @@ export function handleMinAndMaxInterestRateSet(
       theseus.maxInterestRate = event.params._maxInterestRate
       theseus.save()
     }
+  
 }
 
 export function handleMinAndMaxLoanSet(event: MinAndMaxLoanSetEvent): void {

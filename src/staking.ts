@@ -1,4 +1,4 @@
-import { BigInt, ByteArray, Bytes } from "@graphprotocol/graph-ts"
+import { Address, BigInt, ByteArray, Bytes } from "@graphprotocol/graph-ts"
 import {
   AddTokenToPool as AddTokenToPoolEvent,
   FrozenStake as FrozenStakeEvent,
@@ -21,6 +21,15 @@ export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
   poolToken.ammPool = event.params.ammPool
   poolToken.isFrozen = false
   poolToken.save()
+  let theseusToken = PoolToken.load(Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C'))
+  if(theseusToken == null){
+    theseusToken = new PoolToken(Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C'))
+    theseusToken.tokenId = BigInt.fromI32(0)
+    theseusToken.totalSupply = BigInt.fromI32(0)
+    theseusToken.ammPool = Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C')
+    theseusToken.isFrozen = false
+    theseusToken.save()
+  }
 }
 
 export function handleFrozenStake(event: FrozenStakeEvent): void {

@@ -1013,19 +1013,6 @@ export class TheseusDAO extends Entity {
     this.set("loanPoolTheseus", Value.fromBytes(value));
   }
 
-  get balances(): Array<Bytes> {
-    let value = this.get("balances");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
-  }
-
-  set balances(value: Array<Bytes>) {
-    this.set("balances", Value.fromBytesArray(value));
-  }
-
   get stakes(): Array<Bytes> {
     let value = this.get("stakes");
     if (!value || value.kind == ValueKind.NULL) {
