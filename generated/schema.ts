@@ -896,21 +896,17 @@ export class TheseusDAO extends Entity {
     }
   }
 
-  set proposals(value: Array<string>) {
-    this.set("proposals", Value.fromStringArray(value));
-  }
-
-  get poolTokens(): Array<Bytes> {
-    let value = this.get("poolTokens");
+  get poolToken(): Bytes {
+    let value = this.get("poolToken");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBytesArray();
+      return value.toBytes();
     }
   }
 
-  set poolTokens(value: Array<Bytes>) {
-    this.set("poolTokens", Value.fromBytesArray(value));
+  set poolToken(value: Bytes) {
+    this.set("poolToken", Value.fromBytes(value));
   }
 
   get currentId(): BigInt {

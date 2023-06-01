@@ -65,8 +65,8 @@ type PoolBalance @entity{
 }
 type TheseusDAO @entity{
   id:Bytes! 
-  proposals: [Proposal!]! # Proposal[]@derivedFrom(field: "theseusDAO")
-  poolTokens: [PoolToken!]! # PoolToken[]
+  proposals: [Proposal!]!@derivedFrom(field: "theseusDAO") # Proposal[]@derivedFrom(field: "theseusDAO")
+  poolToken: PoolToken! # PoolToken[]
   currentId: BigInt! # uint256
   votingTime: BigInt! # uint256
   maxVotingPower: BigInt! # uint256
