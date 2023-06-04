@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts"
 import {
   AddAmm as AddAmmEvent,
   AmmClosePosition as AmmClosePositionEvent,
@@ -7,7 +7,7 @@ import {
   NewSnappshot as NewSnappshotEvent,
   PriceChange as PriceChangeEvent,
   RemoveAmm as RemoveAmmEvent,
-  UnFreeze as UnFreezeEvent
+  UnFreeze as UnFreezeEvent,
 } from "../generated/AmmViewer/AmmViewer"
 import {
  AriadneDAO,PriceData,
@@ -87,16 +87,26 @@ export function handleNewSnappshot(event: NewSnappshotEvent): void {
   let oldIndex = event.params.newIndex.toI32() - 1
   let oldSnapId = event.params.amm.concatI32(oldIndex)
   let oldSnapEntity = Snapshot.load(oldSnapId)
+  let ffrTobe = BigInt.fromI32(0)
   if (oldSnapEntity == null) {
-    oldSnapEntity = new Snapshot(oldSnapId)
+    snapEntity.totalPositionSize = BigInt.fromI32(0)
+    snapEntity.indexPrice = BigInt.fromI32(0)
+    snapEntity.baseAssetReserve = BigInt.fromI32(0)
+    snapEntity.quoteAssetReserve = BigInt.fromI32(0)
+    snapEntity.ffr = BigInt.fromI32(0)
+    snapEntity.marketPrice = BigDecimal.zero()
+  }else{
+    snapEntity.totalPositionSize = oldSnapEntity.totalPositionSize
+    snapEntity.indexPrice = oldSnapEntity.indexPrice
+    snapEntity.baseAssetReserve = oldSnapEntity.baseAssetReserve
+    snapEntity.quoteAssetReserve = oldSnapEntity.quoteAssetReserve
+    snapEntity.ffr = oldSnapEntity.ffr
+    snapEntity.marketPrice = oldSnapEntity.marketPrice
+    ffrTobe = oldSnapEntity.ffr
   }
-  snapEntity.indexPrice = oldSnapEntity.indexPrice
-  snapEntity.baseAssetReserve = oldSnapEntity.baseAssetReserve
-  snapEntity.quoteAssetReserve = oldSnapEntity.quoteAssetReserve
-  snapEntity.ffr = oldSnapEntity.ffr
-  snapEntity.marketPrice = oldSnapEntity.marketPrice
-  snapEntity.vamm = event.params.amm
-  snapEntity.blockTimestamp = event.block.timestamp
+    snapEntity.index = event.params.newIndex
+    snapEntity.vamm = event.params.amm
+    snapEntity.blockTimestamp = event.block.timestamp
 
   snapEntity.save()
 
@@ -113,7 +123,7 @@ export function handleNewSnappshot(event: NewSnappshotEvent): void {
     ffrEntity = new FFR(ffrId)
   }
   ffrEntity.index = event.params.newIndex.minus(BigInt.fromI32(1))
-  ffrEntity.ffr = oldSnapEntity.ffr
+  ffrEntity.ffr = ffrTobe
   ffrEntity.vAmm = event.params.amm
   ffrEntity.timeStamp = event.block.timestamp
   ffrEntity.save()
@@ -132,11 +142,15 @@ export function handlePriceChange(event: PriceChangeEvent): void {
   let snapEntity = Snapshot.load(snapId)
   if (snapEntity == null) {
     snapEntity = new Snapshot(snapId)
+    snapEntity.blockTimestamp = event.block.timestamp
   }
+  snapEntity.index = event.params.currentIndex
+  snapEntity.vamm = event.params.amm
   snapEntity.indexPrice = event.params.indexPrice
   snapEntity.baseAssetReserve = event.params.baseAsset
   snapEntity.quoteAssetReserve = event.params.quoteAsset
   snapEntity.ffr = event.params.ffr
+  snapEntity.totalPositionSize = entity.totalPositionSize
   let baseAssetDecimal = event.params.baseAsset.toBigDecimal()
   let quoteAssetDecimal = event.params.quoteAsset.toBigDecimal()
 

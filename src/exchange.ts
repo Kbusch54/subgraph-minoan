@@ -180,8 +180,18 @@ export function handleNewPosition(event: NewPositionEvent): void {
   trade.tradeBalance = tradeId
   trade.created = event.params.timeStamp
   trade.liquidated = false
+  trade.startingCost = BigInt.fromI32(0)
   trade.save()
   let tradeBalance = new TradeBalance(tradeId)
+
+  tradeBalance.pnl = BigInt.fromI32(0)
+  tradeBalance.collateral = BigInt.fromI32(0)
+  tradeBalance.leverage = BigInt.fromI32(0)
+  tradeBalance.loanAmt = BigInt.fromI32(0)
+  tradeBalance.interestRate = BigInt.fromI32(0)
+  tradeBalance.positionSize = BigInt.fromI32(0)
+  tradeBalance.entryPrice = BigInt.fromI32(0)
+  tradeBalance.LastFFRPayed = BigInt.fromI32(0)
   tradeBalance.tradeId = event.params.tradeId
   tradeBalance.LastInterestPayed = event.params.timeStamp
   tradeBalance.side = event.params.side
