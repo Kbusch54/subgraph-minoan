@@ -70,10 +70,23 @@ export function handleBorrowAmount(event: BorrowAmountEvent): void {
   //PoolBalance: poolOutstadingLoan poolAvailableBalance 
   let poolBalance = PoolBalance.load(event.params.amm)
   if (poolBalance !== null) {
-    poolBalance.outstandingLoanUsdc = poolBalance.outstandingLoanUsdc.plus(event.params.amount)
+    if(poolBalance.outstandingLoanUsdc.equals(BigInt.zero())){
+      poolBalance.outstandingLoanUsdc = event.params.amount
+    }else{
+      poolBalance.outstandingLoanUsdc = poolBalance.outstandingLoanUsdc.plus(event.params.amount)
+    }
     poolBalance.availableUsdc = poolBalance.availableUsdc.minus(event.params.amount)
+  }else{
+    poolBalance = new PoolBalance(event.params.amm)
+    poolBalance.amm = event.params.amm
+    poolBalance.totalUsdcSupply = poolBalance.outstandingLoanUsdc
+    poolBalance.outstandingLoanUsdc = poolBalance.outstandingLoanUsdc
+    poolBalance.availableUsdc = BigInt.fromI32(0)
+    poolBalance.loanPool = event.params.amm
   }
+  poolBalance.save()
 }
+
 
 export function handleInterestPeriodsSet(event: InterestPeriodsSetEvent): void {
   //LoanPool: interestPeriods

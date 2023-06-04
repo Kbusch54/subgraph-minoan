@@ -163,8 +163,11 @@ export function handlePriceChange(event: PriceChangeEvent): void {
   snapEntity.save()
 
   entity.save()
-  let priceDataID = event.params.amm.concatI32(event.params.currentIndex.toI32())
-  let priceDataEntity = new PriceData(priceDataID)
+  let priceDataID = event.params.amm.concatI32(event.block.timestamp.toI32())
+  let priceDataEntity = PriceData.load(priceDataID)
+  if(priceDataEntity == null){
+    priceDataEntity = new PriceData(priceDataID)
+  }
   priceDataEntity.indexPrice = event.params.indexPrice
   priceDataEntity.vAmm = event.params.amm
   priceDataEntity.timeStamp = event.block.timestamp
