@@ -13,6 +13,7 @@
   "dependencies": {
     "@graphprotocol/graph-cli": "0.49.0",
     "@graphprotocol/graph-ts": "0.29.1",
+    "ethers": "^6.4.1",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {

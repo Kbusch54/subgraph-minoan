@@ -1,5 +1,5 @@
 
-import { Address, BigInt,ByteArray,Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigInt,Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   AddCollateral as AddCollateralEvent,
   AddLiquidity as AddLiquidityEvent,
@@ -16,10 +16,10 @@ import {
   Exchange as ExchangeContract
 } from "../generated/Exchange/Exchange"
 import {
-  AriadneDAO,PriceData,
-  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stake,TheseusDAO,Trade,TradeBalance,User,VAmm
- } from "../generated/schema"
-
+  
+  Balance,LoanPool,PoolBalance,Trade,TradeBalance,User } from "../generated/schema"
+import { log } from "matchstick-as";
+ 
 //  export  function decodeTradeId(tradeId: Bytes): [Bytes, Bytes, BigInt, BigInt] {
     
 //   let sender = Bytes.fromHexString(tradeId.slice(0, 20).toString());
@@ -30,41 +30,72 @@ import {
 //   return [sender, amm, timestamp, side];
 // }
 
+interface TradeID {
+  sender: Address;
+  amm: Address;
+  timestamp: BigInt;
+  side: BigInt;
+}
+export function getTradeId(tradeId: Bytes): string {
+  // Define the types of the data
+  const types = "(address,address, uint256, int256)";
+  // web3.eth.abi.decodeParameters(types, encodedData)
+  // const decoded = ethereum.decode(types, tradeId)!.toTuple()!;
+  // Decode the data
 
+    return ('0x0000000000000_0')
+   
+  
+}
 export function handleAddCollateral(event: AddCollateralEvent): void {
-  let tradeId= event.params.tradeId
+   let exCon = ExchangeContract.bind(event.address)
+    let pos = exCon.positions(event.params.tradeId)
+    let sender =pos.getTrader()
+    let amm = pos.getAmm()
+    let timestamp = pos.getTimeStamp()
+  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
   let trade = Trade.load(tradeId)
-  if(trade !== null){
+  if(trade){
     trade.startingCost = trade.startingCost.plus(event.params.amount)
     trade.save()
     let balance = Balance.load(trade.user)
     let tradeBalance = TradeBalance.load(tradeId)
 
-    if(balance !== null && tradeBalance !== null){
+    if(balance){
       balance.availableUsdc = balance.availableUsdc.minus(event.params.amount)
       balance.totalCollateralUsdc = balance.totalCollateralUsdc.plus(event.params.amount)
-      tradeBalance.collateral = tradeBalance.collateral.plus(event.params.amount)
       balance.save()
+    }
+    if(tradeBalance){
+      tradeBalance.collateral = tradeBalance.collateral.plus(event.params.amount)
       tradeBalance.save()
     }
   }
+  
 }
 
 export function handleAddLiquidity(event: AddLiquidityEvent): void {
   //trade 
-  let trade = Trade.load(event.params.tradeId)
-  if(trade !== null){
+  let exCon = ExchangeContract.bind(event.address)
+    let pos = exCon.positions(event.params.tradeId)
+    let sender =pos.getTrader()
+    let timestamp = pos.getTimeStamp()
+
+  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let trade = Trade.load(tradeId)
+  if(trade){
     trade.startingCost = trade.startingCost.plus(event.params.amount)
+    trade.save()
   //tradeBalance 
-    let tradeBalance = TradeBalance.load(event.params.tradeId)
-    if(tradeBalance !== null){
+    let tradeBalance = TradeBalance.load(tradeId)
+    if(tradeBalance){
       const calc = (tradeBalance.loanAmt.plus(event.params.newLoan)).div((tradeBalance.loanAmt.div(tradeBalance.leverage)).plus(event.params.amount))
       tradeBalance.collateral = tradeBalance.collateral.plus(event.params.amount)
       tradeBalance.loanAmt = tradeBalance.loanAmt.plus(event.params.newLoan)
       tradeBalance.positionSize = tradeBalance.positionSize.plus(event.params.addiotionalPositionSize)
       tradeBalance.leverage = calc
       let lp = LoanPool.load(trade.ammPool)
-      if(lp !== null){
+      if(lp){
         const interestRate = lp.interestRate
         tradeBalance.interestRate = interestRate
       }
@@ -75,7 +106,7 @@ export function handleAddLiquidity(event: AddLiquidityEvent): void {
     }
     let balance = Balance.load(trade.user)
     //balance
-    if(balance !== null){
+    if(balance){
       balance.availableUsdc = balance.availableUsdc.minus(event.params.amount)
       balance.totalCollateralUsdc = balance.totalCollateralUsdc.plus(event.params.amount)
       balance.save()
@@ -84,8 +115,15 @@ export function handleAddLiquidity(event: AddLiquidityEvent): void {
   }
 }
 
+
 export function handleClosePosition(event: ClosePositionEvent): void {
-  let tradeId= event.params.tradeId
+   // @ts-ignore
+   let exCon = ExchangeContract.bind(event.address)
+    let pos = exCon.positions(event.params.tradeId)
+    let sender =pos.getTrader()
+    let timestamp = pos.getTimeStamp()
+
+  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
   let trade = Trade.load(tradeId)
   let exhcnageContract = ExchangeContract.bind(event.address)
   if(trade){
@@ -100,14 +138,14 @@ export function handleClosePosition(event: ClosePositionEvent): void {
       tradeBalance.leverage = BigInt.fromI32(0)
       tradeBalance.exitPrice = event.params.closePrice
       tradeBalance.exitTime = event.params.closeTime
-      if(tradeBalance.pnl !==null){
+      if(tradeBalance.pnl){
         tradeBalance.pnl = tradeBalance.pnl.plus(event.params.pnl)
       }else{
         tradeBalance.pnl = event.params.pnl
       }
       tradeBalance.save()
       let balance = Balance.load(trade.user)
-      if(balance !== null){
+      if(balance){
        
   
         const userAddress = Address.fromBytes(trade.user)
@@ -116,7 +154,7 @@ export function handleClosePosition(event: ClosePositionEvent): void {
         balance.save()
       }
       let poolBalance = PoolBalance.load(trade.ammPool)
-      if(poolBalance !== null){
+      if(poolBalance){
         poolBalance.totalUsdcSupply = exhcnageContract.poolTotalUsdcSupply(Address.fromBytes(trade.ammPool))
         poolBalance.availableUsdc = exhcnageContract.poolAvailableUsdc(Address.fromBytes(trade.ammPool))
         poolBalance.save()
@@ -124,6 +162,7 @@ export function handleClosePosition(event: ClosePositionEvent): void {
     }
   }
 }
+
 
 export function handleDeposit(event: DepositEvent): void {
   let user = User.load(event.params.user)
@@ -144,35 +183,61 @@ export function handleDeposit(event: DepositEvent): void {
     balance.availableUsdc = balance.availableUsdc.plus(event.params.amount)
     balance.save()
   }
+
 }
 
 export function handleFfrAdjust(event: FfrAdjustEvent): void {
-  let tradeBalance = TradeBalance.load(event.params.tradeId)
-  if(tradeBalance !== null){
+   // @ts-ignore
+   let exCon = ExchangeContract.bind(event.address)
+    let pos = exCon.positions(event.params.tradeId)
+    let sender =pos.getTrader()
+    let timestamp = pos.getTimeStamp()
+
+  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeBalance = TradeBalance.load(tradeId)
+  if(tradeBalance){
     tradeBalance.collateral = tradeBalance.collateral.plus(event.params.amount)
     tradeBalance.save()
-  }
-  let poolBalance = PoolBalance.load(Bytes.fromUTF8(event.params.tradeId.slice(0, 20).toString()))
-  if(poolBalance !== null){
-    poolBalance.availableUsdc = poolBalance.availableUsdc.minus(event.params.amount)
-    poolBalance.totalUsdcSupply = poolBalance.totalUsdcSupply.minus(event.params.amount)
-    poolBalance.save()
+    let trade = Trade.load(tradeBalance.tradeId)
+    if(trade){
+
+      let amm = trade.ammPool
+      let poolBalance = PoolBalance.load(amm)
+      if(poolBalance){
+        poolBalance.availableUsdc = poolBalance.availableUsdc.minus(event.params.amount)
+        poolBalance.totalUsdcSupply = poolBalance.totalUsdcSupply.minus(event.params.amount)
+        poolBalance.save()
+      }
+    }
   }
 }
 
+
 export function handleLiquidated(event: LiquidatedEvent): void {
-  let trade = Trade.load(event.params.tradeId)
-  if(trade !== null){
+   // @ts-ignore
+   let exCon = ExchangeContract.bind(event.address)
+    let pos = exCon.positions(event.params.tradeId)
+    let sender =pos.getTrader()
+    let timestamp = pos.getTimeStamp()
+
+  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let trade = Trade.load(tradeId)
+  if(trade){
     trade.liquidated = true
     trade.isActive = false
     trade.save()
   }
 }
 
+
 export function handleNewPosition(event: NewPositionEvent): void {
-  let tradeId= event.params.tradeId
+ 
+let sender = event.params.trader
+let timestamp = event.params.timeStamp;
+
+let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
   let trade = new Trade(tradeId)
-  trade.tradeId = event.params.tradeId
+  trade.tradeId = tradeId
   trade.user = event.params.trader
   trade.ammPool = event.params.amm
   trade.vamm = event.params.amm
@@ -192,14 +257,24 @@ export function handleNewPosition(event: NewPositionEvent): void {
   tradeBalance.positionSize = BigInt.fromI32(0)
   tradeBalance.entryPrice = BigInt.fromI32(0)
   tradeBalance.LastFFRPayed = BigInt.fromI32(0)
-  tradeBalance.tradeId = event.params.tradeId
+  tradeBalance.tradeId = tradeId
   tradeBalance.LastInterestPayed = event.params.timeStamp
   tradeBalance.side = event.params.side
+
   tradeBalance.save()
 }
 
+
 export function handleOpenPosition(event: OpenPositionEvent): void {
-  let tradeBalance = TradeBalance.load(event.params.tradeId)
+ 
+  let exCon = ExchangeContract.bind(event.address)
+  let pos = exCon.positions(event.params.tradeId)
+  // let sender =pos.getTrader()
+  let sender =event.transaction.from
+  let timestamp = event.block.timestamp
+  // let timestamp = pos.getTimeStamp()
+  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeBalance = TradeBalance.load(tradeId)
   if(tradeBalance !== null){
     tradeBalance.LastFFRPayed = event.params.lastFundingRate
     tradeBalance.entryPrice = event.params.entryPrice
@@ -207,7 +282,7 @@ export function handleOpenPosition(event: OpenPositionEvent): void {
     tradeBalance.collateral = event.params.collateral
     tradeBalance.leverage = event.params.loanAmt.div(event.params.collateral)
     tradeBalance.positionSize = event.params.positionSize
-    let trade = Trade.load(event.params.tradeId)
+    let trade = Trade.load(tradeId)
     if(trade !== null){
       let lp = LoanPool.load(trade.ammPool)
       if(lp !== null){
@@ -237,21 +312,30 @@ export function handleOpenPosition(event: OpenPositionEvent): void {
   }
 }
 
+
+
 export function handlePayInterest(event: PayInterestEvent): void {
-  let tradeBalance = TradeBalance.load(event.params.tradeId)
-  if(tradeBalance !== null){
+   // @ts-ignore
+   let exCon = ExchangeContract.bind(event.address)
+    let pos = exCon.positions(event.params.tradeId)
+    let sender =pos.getTrader()
+    let timestamp = pos.getTimeStamp()
+    let amm = pos.getAmm()
+
+  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeBalance = TradeBalance.load(tradeId)
+  if(tradeBalance){
     tradeBalance.collateral = tradeBalance.collateral.minus(event.params.totalAmount)
+    tradeBalance.LastInterestPayed = event.block.timestamp
   }
-  let decodedTradeId = event.params.tradeId
-  let user  = Bytes.fromUTF8(decodedTradeId.slice(0, 20).toString())
-  let amm = Bytes.fromUTF8(decodedTradeId.slice(20, 40).toString())
-  let balance = Balance.load(user)
-  if(balance !== null){
+
+  let balance = Balance.load(sender)
+  if(balance){
     balance.totalCollateralUsdc = balance.totalCollateralUsdc.minus(event.params.totalAmount)
     balance.save()
   }
   let poolBal = PoolBalance.load(amm)
-  if(poolBal !== null){
+  if(poolBal){
     poolBal.availableUsdc = poolBal.availableUsdc.plus(event.params.amountToPool)
     poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.plus(event.params.amountToPool)
     poolBal.save()
@@ -260,23 +344,30 @@ export function handlePayInterest(event: PayInterestEvent): void {
     let exhcnageCon  = ExchangeContract.bind(event.address)
     let theseusAdd = exhcnageCon.theseusDao()
     let theseus = Balance.load(theseusAdd)
-    if(theseus !== null){
+    if(theseus){
       theseus.availableUsdc = theseus.availableUsdc.plus(event.params.amountToPool)
       theseus.save()
     }
   }
 }
 
+
 export function handleRemoveCollateral(event: RemoveCollateralEvent): void {
-  let tradeId= event.params.tradeId
+   // @ts-ignore
+   let exCon = ExchangeContract.bind(event.address)
+    let pos = exCon.positions(event.params.tradeId)
+    let sender =pos.getTrader()
+    let timestamp = pos.getTimeStamp()
+
+  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
   let trade = Trade.load(tradeId)
-  if(trade !== null){
+  if(trade){
     trade.startingCost = trade.startingCost.minus(event.params.amount)
     trade.save()
     let balance = Balance.load(trade.user)
     let tradeBalance = TradeBalance.load(tradeId)
 
-    if(balance !== null && tradeBalance !== null){
+    if(balance && tradeBalance){
       balance.availableUsdc = balance.availableUsdc.plus(event.params.amount)
       balance.totalCollateralUsdc = balance.totalCollateralUsdc.minus(event.params.amount)
       tradeBalance.collateral = tradeBalance.collateral.minus(event.params.amount)
@@ -284,34 +375,41 @@ export function handleRemoveCollateral(event: RemoveCollateralEvent): void {
       tradeBalance.save()
     }
   }
-
 }
+
+
 
 export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
   //
   //tradeBalance: loanAmt positionSize
-  let tradeBalance = TradeBalance.load(event.params.tradeId)
-  if(tradeBalance !== null){
+   // @ts-ignore
+   let exCon = ExchangeContract.bind(event.address)
+    let pos = exCon.positions(event.params.tradeId)
+    let sender =pos.getTrader()
+    let timestamp = pos.getTimeStamp()
+
+  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeBalance = TradeBalance.load(tradeId)
+  if(tradeBalance){
     tradeBalance.loanAmt = tradeBalance.loanAmt.minus(event.params.amountOwed)
     tradeBalance.positionSize = tradeBalance.positionSize.minus(event.params.positionSizeRemoved)
-    if(tradeBalance.pnl !== null){
+    if(tradeBalance.pnl){
       tradeBalance.pnl = tradeBalance.pnl.plus(event.params.usdcReturned).minus(event.params.amountOwed)
     }else{
       tradeBalance.pnl = event.params.usdcReturned.minus(event.params.amountOwed)
     }
   //balance:  availableUsdc
-    let decodedTradeId = event.params.tradeId
-    let user  =  Bytes.fromUTF8(decodedTradeId.slice(0, 20).toString());
-    let balance = Balance.load(user)
-    if(balance !== null){
+    
+    let balance = Balance.load(sender)
+    if(balance){
       balance.availableUsdc = balance.availableUsdc.plus(event.params.usdcReturned).minus(event.params.amountOwed)
       balance.save()
     }
   //poolBalance: totalusdcSupply availableUsdc
-  let amm = Bytes.fromUTF8(decodedTradeId.slice(20, 40).toString());
+    let amm = Bytes.fromHexString(tradeId.slice(20, 40).toString());
     let poolBal = PoolBalance.load(amm)
     const pnl = event.params.usdcReturned.minus(event.params.amountOwed)
-    if(poolBal !== null){
+    if(poolBal){
       if(pnl > BigInt.fromI32(0)){
       poolBal.availableUsdc = poolBal.availableUsdc.minus(pnl)
       poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.minus(pnl)
@@ -324,10 +422,12 @@ export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
   }
 }
 
+
 export function handleWithdraw(event: WithdrawEvent): void {
   let balance = Balance.load(event.params.user)
   if(balance !=null){
     balance.availableUsdc = balance.availableUsdc.minus(event.params.amount)
     balance.save()
   }
+
 }

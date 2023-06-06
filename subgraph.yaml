@@ -6,9 +6,9 @@ dataSources:
     name: Staking
     network: goerli
     source:
-      address: "0x1d287619363BF9803E36d0a3816FEA19AF8fb3FE"
+      address: "0x8EdC8f028eaE0ACb8276d517D54e2680d57EA697"
       abi: Staking
-      startBlock: 9120771
+      startBlock: 9122465
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -38,9 +38,9 @@ dataSources:
     name: TheseusDAO
     network: goerli
     source:
-      address: "0x72786B74eB40C668B5A44976772419D10372aDF7"
+      address: "0x8FdB0BacA21b8b1617B6A5b720517E0701c338a1"
       abi: TheseusDAO
-      startBlock: 9120771
+      startBlock: 9122465
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -76,9 +76,9 @@ dataSources:
     name: Exchange
     network: goerli
     source:
-      address: "0xcE1339Da3340FE10B52C5ec08D4e12846a6bfdfA"
+      address: "0x1d67E35482a74661d287686F034dafd39352ccC3"
       abi: Exchange
-      startBlock: 9120771
+      startBlock: 9122465
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -129,9 +129,9 @@ dataSources:
     name: CreateAriadnes
     network: goerli
     source:
-      address: "0x0Caa6635f839790d6F2d8Dc7800085bF6CF3Eabe"
+      address: "0x1F31e98b4cdF477957727462854f2CAfA57CAF69"
       abi: CreateAriadnes
-      startBlock: 9120771
+      startBlock: 9122465
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -168,9 +168,9 @@ dataSources:
     name: AmmViewer
     network: goerli
     source:
-      address: "0x9288e024BA92117329a83e33f97AF971D205e2A7"
+      address: "0xbC01aAd4C5256888B965C5Dab56a705708a439B7"
       abi: AmmViewer
-      startBlock: 9120771
+      startBlock: 9122465
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -209,9 +209,9 @@ dataSources:
     name: LoanPool
     network: goerli
     source:
-      address: "0x483b0211EAA4b6d7C99fDaAA58C2c66E176ed105"
+      address: "0xdbAf4a1447A5D76c8255C6F0c098467fDa1C3Da1"
       abi: LoanPool
-      startBlock: 9120771
+      startBlock: 9122465
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

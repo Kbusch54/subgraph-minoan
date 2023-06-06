@@ -8,8 +8,8 @@ type User @entity {
   trades: [Trade!]@derivedFrom(field:"user") # Trade[]
 }
 type Trade @entity{
-  id:Bytes!
-  tradeId: Bytes! # bytes!
+  id:String!
+  tradeId: String! # bytes!
   user: User! # address!
   ammPool: LoanPool! # address!
   vamm: VAmm! # address!
@@ -21,7 +21,7 @@ type Trade @entity{
 }
 
 type TradeBalance @entity{
-  id:Bytes!
+  id:String!
   tradeId: Trade! # bytes!
   LastInterestPayed: BigInt! # uint256
   LastFFRPayed: BigInt! # uint256

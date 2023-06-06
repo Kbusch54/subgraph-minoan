@@ -21,12 +21,12 @@ export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
   poolToken.ammPool = event.params.ammPool
   poolToken.isFrozen = false
   poolToken.save()
-  let theseusToken = PoolToken.load(Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C'))
+  let theseusToken = PoolToken.load(Address.fromString('0x8FdB0BacA21b8b1617B6A5b720517E0701c338a1'))
   if(theseusToken == null){
-    theseusToken = new PoolToken(Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C'))
+    theseusToken = new PoolToken(Address.fromString('0x8FdB0BacA21b8b1617B6A5b720517E0701c338a1'))
     theseusToken.tokenId = BigInt.fromI32(0)
     theseusToken.totalSupply = BigInt.fromI32(0)
-    theseusToken.ammPool = Address.fromString('0xA547af463d3A202e0E85CA766FB67eE0395e4D5C')
+    theseusToken.ammPool = Address.fromString('0x8FdB0BacA21b8b1617B6A5b720517E0701c338a1')
     theseusToken.isFrozen = false
     theseusToken.save()
   }

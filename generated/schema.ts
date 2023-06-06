@@ -87,20 +87,20 @@ export class User extends Entity {
     }
   }
 
-  get trades(): Array<Bytes> | null {
+  get trades(): Array<string> | null {
     let value = this.get("trades");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
-      return value.toBytesArray();
+      return value.toStringArray();
     }
   }
 }
 
 export class Trade extends Entity {
-  constructor(id: Bytes) {
+  constructor(id: string) {
     super();
-    this.set("id", Value.fromBytes(id));
+    this.set("id", Value.fromString(id));
   }
 
   save(): void {
@@ -108,47 +108,45 @@ export class Trade extends Entity {
     assert(id != null, "Cannot save Trade entity without an ID");
     if (id) {
       assert(
-        id.kind == ValueKind.BYTES,
-        `Entities of type Trade must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        id.kind == ValueKind.STRING,
+        `Entities of type Trade must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
       );
-      store.set("Trade", id.toBytes().toHexString(), this);
+      store.set("Trade", id.toString(), this);
     }
   }
 
-  static loadInBlock(id: Bytes): Trade | null {
-    return changetype<Trade | null>(
-      store.get_in_block("Trade", id.toHexString())
-    );
+  static loadInBlock(id: string): Trade | null {
+    return changetype<Trade | null>(store.get_in_block("Trade", id));
   }
 
-  static load(id: Bytes): Trade | null {
-    return changetype<Trade | null>(store.get("Trade", id.toHexString()));
+  static load(id: string): Trade | null {
+    return changetype<Trade | null>(store.get("Trade", id));
   }
 
-  get id(): Bytes {
+  get id(): string {
     let value = this.get("id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set id(value: Bytes) {
-    this.set("id", Value.fromBytes(value));
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
   }
 
-  get tradeId(): Bytes {
+  get tradeId(): string {
     let value = this.get("tradeId");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set tradeId(value: Bytes) {
-    this.set("tradeId", Value.fromBytes(value));
+  set tradeId(value: string) {
+    this.set("tradeId", Value.fromString(value));
   }
 
   get user(): Bytes {
@@ -190,17 +188,17 @@ export class Trade extends Entity {
     this.set("vamm", Value.fromBytes(value));
   }
 
-  get tradeBalance(): Bytes {
+  get tradeBalance(): string {
     let value = this.get("tradeBalance");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set tradeBalance(value: Bytes) {
-    this.set("tradeBalance", Value.fromBytes(value));
+  set tradeBalance(value: string) {
+    this.set("tradeBalance", Value.fromString(value));
   }
 
   get created(): BigInt {
@@ -257,9 +255,9 @@ export class Trade extends Entity {
 }
 
 export class TradeBalance extends Entity {
-  constructor(id: Bytes) {
+  constructor(id: string) {
     super();
-    this.set("id", Value.fromBytes(id));
+    this.set("id", Value.fromString(id));
   }
 
   save(): void {
@@ -267,49 +265,47 @@ export class TradeBalance extends Entity {
     assert(id != null, "Cannot save TradeBalance entity without an ID");
     if (id) {
       assert(
-        id.kind == ValueKind.BYTES,
-        `Entities of type TradeBalance must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        id.kind == ValueKind.STRING,
+        `Entities of type TradeBalance must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
       );
-      store.set("TradeBalance", id.toBytes().toHexString(), this);
+      store.set("TradeBalance", id.toString(), this);
     }
   }
 
-  static loadInBlock(id: Bytes): TradeBalance | null {
+  static loadInBlock(id: string): TradeBalance | null {
     return changetype<TradeBalance | null>(
-      store.get_in_block("TradeBalance", id.toHexString())
+      store.get_in_block("TradeBalance", id)
     );
   }
 
-  static load(id: Bytes): TradeBalance | null {
-    return changetype<TradeBalance | null>(
-      store.get("TradeBalance", id.toHexString())
-    );
+  static load(id: string): TradeBalance | null {
+    return changetype<TradeBalance | null>(store.get("TradeBalance", id));
   }
 
-  get id(): Bytes {
+  get id(): string {
     let value = this.get("id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set id(value: Bytes) {
-    this.set("id", Value.fromBytes(value));
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
   }
 
-  get tradeId(): Bytes {
+  get tradeId(): string {
     let value = this.get("tradeId");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set tradeId(value: Bytes) {
-    this.set("tradeId", Value.fromBytes(value));
+  set tradeId(value: string) {
+    this.set("tradeId", Value.fromString(value));
   }
 
   get LastInterestPayed(): BigInt {
@@ -665,12 +661,12 @@ export class LoanPool extends Entity {
     }
   }
 
-  get trades(): Array<Bytes> | null {
+  get trades(): Array<string> | null {
     let value = this.get("trades");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
-      return value.toBytesArray();
+      return value.toStringArray();
     }
   }
 
