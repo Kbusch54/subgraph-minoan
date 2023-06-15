@@ -11,10 +11,16 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
         "indexed": false,
-        "internalType": "bytes",
-        "name": "tradeId",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -31,9 +37,15 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes",
-        "name": "tradeId",
-        "type": "bytes"
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -62,9 +74,15 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes",
-        "name": "tradeId",
-        "type": "bytes"
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -111,10 +129,16 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
         "indexed": false,
-        "internalType": "bytes",
-        "name": "tradeId",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -131,9 +155,15 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes",
-        "name": "tradeId",
-        "type": "bytes"
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       }
     ],
     "name": "Liquidated",
@@ -142,12 +172,6 @@
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes",
-        "name": "tradeId",
-        "type": "bytes"
-      },
       {
         "indexed": true,
         "internalType": "address",
@@ -181,9 +205,15 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes",
-        "name": "tradeId",
-        "type": "bytes"
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -223,10 +253,16 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
         "indexed": false,
-        "internalType": "bytes",
-        "name": "tradeId",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -248,10 +284,16 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
         "indexed": false,
-        "internalType": "bytes",
-        "name": "tradeId",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -268,9 +310,15 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes",
-        "name": "tradeId",
-        "type": "bytes"
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -350,7 +398,8 @@
         "internalType": "uint256",
         "name": "_addedCollateral",
         "type": "uint256"
-      }
+      },
+      { "internalType": "bytes", "name": "_payload", "type": "bytes" }
     ],
     "name": "addLiquidityToPosition",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
@@ -396,7 +445,8 @@
   },
   {
     "inputs": [
-      { "internalType": "bytes", "name": "_tradeId", "type": "bytes" }
+      { "internalType": "bytes", "name": "_tradeId", "type": "bytes" },
+      { "internalType": "bytes", "name": "_payload", "type": "bytes" }
     ],
     "name": "closeOutPosition",
     "outputs": [],
@@ -465,7 +515,8 @@
   },
   {
     "inputs": [
-      { "internalType": "bytes", "name": "_tradeId", "type": "bytes" }
+      { "internalType": "bytes", "name": "_tradeId", "type": "bytes" },
+      { "internalType": "bytes", "name": "_payload", "type": "bytes" }
     ],
     "name": "liquidate",
     "outputs": [],
@@ -484,7 +535,8 @@
       { "internalType": "address", "name": "_amm", "type": "address" },
       { "internalType": "uint256", "name": "_collateral", "type": "uint256" },
       { "internalType": "uint256", "name": "_leverage", "type": "uint256" },
-      { "internalType": "int256", "name": "_side", "type": "int256" }
+      { "internalType": "int256", "name": "_side", "type": "int256" },
+      { "internalType": "bytes", "name": "_payload", "type": "bytes" }
     ],
     "name": "openPosition",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
@@ -569,7 +621,8 @@
   {
     "inputs": [
       { "internalType": "bytes", "name": "_tradeId", "type": "bytes" },
-      { "internalType": "int256", "name": "_positionSize", "type": "int256" }
+      { "internalType": "int256", "name": "_positionSize", "type": "int256" },
+      { "internalType": "bytes", "name": "_payload", "type": "bytes" }
     ],
     "name": "removeLiquidityFromPosition",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],

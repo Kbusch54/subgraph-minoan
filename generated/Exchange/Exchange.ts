@@ -23,12 +23,16 @@ export class AddCollateral__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get timestamp(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 
   get amount(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
+    return this._event.parameters[2].value.toBigInt();
   }
 }
 
@@ -45,20 +49,24 @@ export class AddLiquidity__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
   }
 
-  get amount(): BigInt {
+  get timestamp(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get newLoan(): BigInt {
+  get amount(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 
-  get addiotionalPositionSize(): BigInt {
+  get newLoan(): BigInt {
     return this._event.parameters[3].value.toBigInt();
+  }
+
+  get addiotionalPositionSize(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
   }
 }
 
@@ -75,20 +83,24 @@ export class ClosePosition__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
   }
 
-  get closePrice(): BigInt {
+  get timestamp(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get closeTime(): BigInt {
+  get closePrice(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 
-  get pnl(): BigInt {
+  get closeTime(): BigInt {
     return this._event.parameters[3].value.toBigInt();
+  }
+
+  get pnl(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
   }
 }
 
@@ -127,12 +139,16 @@ export class FfrAdjust__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get timestamp(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 
   get amount(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
+    return this._event.parameters[2].value.toBigInt();
   }
 }
 
@@ -149,8 +165,12 @@ export class Liquidated__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get timestamp(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 }
 
@@ -167,24 +187,20 @@ export class NewPosition__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
-  }
-
   get trader(): Address {
-    return this._event.parameters[1].value.toAddress();
+    return this._event.parameters[0].value.toAddress();
   }
 
   get amm(): Address {
-    return this._event.parameters[2].value.toAddress();
+    return this._event.parameters[1].value.toAddress();
   }
 
   get side(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
+    return this._event.parameters[2].value.toBigInt();
   }
 
   get timeStamp(): BigInt {
-    return this._event.parameters[4].value.toBigInt();
+    return this._event.parameters[3].value.toBigInt();
   }
 }
 
@@ -201,28 +217,32 @@ export class OpenPosition__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
   }
 
-  get collateral(): BigInt {
+  get timestamp(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get loanAmt(): BigInt {
+  get collateral(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 
-  get positionSize(): BigInt {
+  get loanAmt(): BigInt {
     return this._event.parameters[3].value.toBigInt();
   }
 
-  get entryPrice(): BigInt {
+  get positionSize(): BigInt {
     return this._event.parameters[4].value.toBigInt();
   }
 
-  get lastFundingRate(): BigInt {
+  get entryPrice(): BigInt {
     return this._event.parameters[5].value.toBigInt();
+  }
+
+  get lastFundingRate(): BigInt {
+    return this._event.parameters[6].value.toBigInt();
   }
 }
 
@@ -239,16 +259,20 @@ export class PayInterest__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
   }
 
-  get totalAmount(): BigInt {
+  get timestamp(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get amountToPool(): BigInt {
+  get totalAmount(): BigInt {
     return this._event.parameters[2].value.toBigInt();
+  }
+
+  get amountToPool(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
   }
 }
 
@@ -265,12 +289,16 @@ export class RemoveCollateral__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get timestamp(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 
   get amount(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
+    return this._event.parameters[2].value.toBigInt();
   }
 }
 
@@ -287,20 +315,24 @@ export class RemoveLiquidity__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
   }
 
-  get positionSizeRemoved(): BigInt {
+  get timestamp(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get amountOwed(): BigInt {
+  get positionSizeRemoved(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 
-  get usdcReturned(): BigInt {
+  get amountOwed(): BigInt {
     return this._event.parameters[3].value.toBigInt();
+  }
+
+  get usdcReturned(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
   }
 }
 
@@ -513,15 +545,17 @@ export class Exchange extends ethereum.SmartContract {
   addLiquidityToPosition(
     _tradeId: Bytes,
     _leverage: BigInt,
-    _addedCollateral: BigInt
+    _addedCollateral: BigInt,
+    _payload: Bytes
   ): boolean {
     let result = super.call(
       "addLiquidityToPosition",
-      "addLiquidityToPosition(bytes,uint256,uint256):(bool)",
+      "addLiquidityToPosition(bytes,uint256,uint256,bytes):(bool)",
       [
         ethereum.Value.fromBytes(_tradeId),
         ethereum.Value.fromUnsignedBigInt(_leverage),
-        ethereum.Value.fromUnsignedBigInt(_addedCollateral)
+        ethereum.Value.fromUnsignedBigInt(_addedCollateral),
+        ethereum.Value.fromBytes(_payload)
       ]
     );
 
@@ -531,15 +565,17 @@ export class Exchange extends ethereum.SmartContract {
   try_addLiquidityToPosition(
     _tradeId: Bytes,
     _leverage: BigInt,
-    _addedCollateral: BigInt
+    _addedCollateral: BigInt,
+    _payload: Bytes
   ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
       "addLiquidityToPosition",
-      "addLiquidityToPosition(bytes,uint256,uint256):(bool)",
+      "addLiquidityToPosition(bytes,uint256,uint256,bytes):(bool)",
       [
         ethereum.Value.fromBytes(_tradeId),
         ethereum.Value.fromUnsignedBigInt(_leverage),
-        ethereum.Value.fromUnsignedBigInt(_addedCollateral)
+        ethereum.Value.fromUnsignedBigInt(_addedCollateral),
+        ethereum.Value.fromBytes(_payload)
       ]
     );
     if (result.reverted) {
@@ -725,16 +761,18 @@ export class Exchange extends ethereum.SmartContract {
     _amm: Address,
     _collateral: BigInt,
     _leverage: BigInt,
-    _side: BigInt
+    _side: BigInt,
+    _payload: Bytes
   ): boolean {
     let result = super.call(
       "openPosition",
-      "openPosition(address,uint256,uint256,int256):(bool)",
+      "openPosition(address,uint256,uint256,int256,bytes):(bool)",
       [
         ethereum.Value.fromAddress(_amm),
         ethereum.Value.fromUnsignedBigInt(_collateral),
         ethereum.Value.fromUnsignedBigInt(_leverage),
-        ethereum.Value.fromSignedBigInt(_side)
+        ethereum.Value.fromSignedBigInt(_side),
+        ethereum.Value.fromBytes(_payload)
       ]
     );
 
@@ -745,16 +783,18 @@ export class Exchange extends ethereum.SmartContract {
     _amm: Address,
     _collateral: BigInt,
     _leverage: BigInt,
-    _side: BigInt
+    _side: BigInt,
+    _payload: Bytes
   ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
       "openPosition",
-      "openPosition(address,uint256,uint256,int256):(bool)",
+      "openPosition(address,uint256,uint256,int256,bytes):(bool)",
       [
         ethereum.Value.fromAddress(_amm),
         ethereum.Value.fromUnsignedBigInt(_collateral),
         ethereum.Value.fromUnsignedBigInt(_leverage),
-        ethereum.Value.fromSignedBigInt(_side)
+        ethereum.Value.fromSignedBigInt(_side),
+        ethereum.Value.fromBytes(_payload)
       ]
     );
     if (result.reverted) {
@@ -936,13 +976,18 @@ export class Exchange extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  removeLiquidityFromPosition(_tradeId: Bytes, _positionSize: BigInt): boolean {
+  removeLiquidityFromPosition(
+    _tradeId: Bytes,
+    _positionSize: BigInt,
+    _payload: Bytes
+  ): boolean {
     let result = super.call(
       "removeLiquidityFromPosition",
-      "removeLiquidityFromPosition(bytes,int256):(bool)",
+      "removeLiquidityFromPosition(bytes,int256,bytes):(bool)",
       [
         ethereum.Value.fromBytes(_tradeId),
-        ethereum.Value.fromSignedBigInt(_positionSize)
+        ethereum.Value.fromSignedBigInt(_positionSize),
+        ethereum.Value.fromBytes(_payload)
       ]
     );
 
@@ -951,14 +996,16 @@ export class Exchange extends ethereum.SmartContract {
 
   try_removeLiquidityFromPosition(
     _tradeId: Bytes,
-    _positionSize: BigInt
+    _positionSize: BigInt,
+    _payload: Bytes
   ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
       "removeLiquidityFromPosition",
-      "removeLiquidityFromPosition(bytes,int256):(bool)",
+      "removeLiquidityFromPosition(bytes,int256,bytes):(bool)",
       [
         ethereum.Value.fromBytes(_tradeId),
-        ethereum.Value.fromSignedBigInt(_positionSize)
+        ethereum.Value.fromSignedBigInt(_positionSize),
+        ethereum.Value.fromBytes(_payload)
       ]
     );
     if (result.reverted) {
@@ -1255,6 +1302,10 @@ export class AddLiquidityToPositionCall__Inputs {
   get _addedCollateral(): BigInt {
     return this._call.inputValues[2].value.toBigInt();
   }
+
+  get _payload(): Bytes {
+    return this._call.inputValues[3].value.toBytes();
+  }
 }
 
 export class AddLiquidityToPositionCall__Outputs {
@@ -1391,6 +1442,10 @@ export class CloseOutPositionCall__Inputs {
   get _tradeId(): Bytes {
     return this._call.inputValues[0].value.toBytes();
   }
+
+  get _payload(): Bytes {
+    return this._call.inputValues[1].value.toBytes();
+  }
 }
 
 export class CloseOutPositionCall__Outputs {
@@ -1451,6 +1506,10 @@ export class LiquidateCall__Inputs {
   get _tradeId(): Bytes {
     return this._call.inputValues[0].value.toBytes();
   }
+
+  get _payload(): Bytes {
+    return this._call.inputValues[1].value.toBytes();
+  }
 }
 
 export class LiquidateCall__Outputs {
@@ -1492,6 +1551,10 @@ export class OpenPositionCall__Inputs {
 
   get _side(): BigInt {
     return this._call.inputValues[3].value.toBigInt();
+  }
+
+  get _payload(): Bytes {
+    return this._call.inputValues[4].value.toBytes();
   }
 }
 
@@ -1636,6 +1699,10 @@ export class RemoveLiquidityFromPositionCall__Inputs {
 
   get _positionSize(): BigInt {
     return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get _payload(): Bytes {
+    return this._call.inputValues[2].value.toBytes();
   }
 }
 

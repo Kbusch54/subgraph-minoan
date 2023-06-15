@@ -3,12 +3,146 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
+    name: Exchange
+    network: goerli
+    source:
+      address: "0x909ABE9609cC77286f5201d6CfFB91aCefC86902"
+      abi: Exchange
+      startBlock: 9184177
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AddCollateral
+        - AddLiquidity
+        - ClosePosition
+        - Deposit
+        - FfrAdjust
+        - Liquidated
+        - NewPosition
+        - OpenPosition
+        - PayInterest
+        - RemoveCollateral
+        - RemoveLiquidity
+        - Withdraw
+      abis:
+        - name: Exchange
+          file: ./abis/Exchange.json
+      eventHandlers:
+        - event: AddCollateral(indexed address,uint256,uint256)
+          handler: handleAddCollateral
+        - event: AddLiquidity(indexed address,uint256,uint256,uint256,int256)
+          handler: handleAddLiquidity
+        - event: ClosePosition(indexed address,uint256,uint256,uint256,int256)
+          handler: handleClosePosition
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+        - event: FfrAdjust(indexed address,uint256,int256)
+          handler: handleFfrAdjust
+        - event: Liquidated(indexed address,uint256)
+          handler: handleLiquidated
+        - event: NewPosition(indexed address,indexed address,int256,uint256)
+          handler: handleNewPosition
+        - event: OpenPosition(indexed address,uint256,uint256,uint256,int256,uint256,uint256)
+          handler: handleOpenPosition
+        - event: PayInterest(indexed address,uint256,uint256,uint256)
+          handler: handlePayInterest
+        - event: RemoveCollateral(indexed address,uint256,uint256)
+          handler: handleRemoveCollateral
+        - event: RemoveLiquidity(indexed address,uint256,int256,int256,int256)
+          handler: handleRemoveLiquidity
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
+      file: ./src/exchange.ts
+  - kind: ethereum
+    name: LoanPool
+    network: goerli
+    source:
+      address: "0xd13427B7aa8Ef6f3B009F07D3c6762a3354B3C68"
+      abi: LoanPool
+      startBlock: 9184186
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AddDebt
+        - BorrowAmount
+        - InterestPeriodsSet
+        - LoanInterestRateSet
+        - LoanPoolInitialized
+        - LoanPoolValues
+        - MMRSet
+        - MaxLoanSet
+        - MinAndMaxHoldingsReqPercentageSet
+        - MinAndMaxInterestPeriodsSet
+        - MinAndMaxInterestRateSet
+        - MinAndMaxLoanSet
+        - MinAndMaxMMRSet
+        - MinAndMaxTradingFeeSet
+        - MinHoldingsReqPercentageSet
+        - MinLoanSet
+        - PayDebt
+        - LoanPoolPayInterest
+        - RepayLoan
+        - TradingFeeSet
+        - UpdateTheseus
+      abis:
+        - name: LoanPool
+          file: ./abis/LoanPool.json
+      eventHandlers:
+        - event: AddDebt(indexed address,uint256)
+          handler: handleAddDebt
+        - event: BorrowAmount(indexed address,uint256,indexed address,uint256)
+          handler: handleBorrowAmount
+        - event: InterestPeriodsSet(uint256,indexed address)
+          handler: handleInterestPeriodsSet
+        - event: LoanInterestRateSet(uint256,indexed address)
+          handler: handleLoanInterestRateSet
+        - event: LoanPoolInitialized(indexed address,indexed address,uint256)
+          handler: handleLoanPoolInitialized
+        - event: LoanPoolValues(indexed
+            address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleLoanPoolValues
+        - event: MMRSet(uint256,indexed address)
+          handler: handleMMRSet
+        - event: MaxLoanSet(uint256,indexed address)
+          handler: handleMaxLoanSet
+        - event: MinAndMaxHoldingsReqPercentageSet(uint256,uint256)
+          handler: handleMinAndMaxHoldingsReqPercentageSet
+        - event: MinAndMaxInterestPeriodsSet(uint256,uint256)
+          handler: handleMinAndMaxInterestPeriodsSet
+        - event: MinAndMaxInterestRateSet(uint256,uint256)
+          handler: handleMinAndMaxInterestRateSet
+        - event: MinAndMaxLoanSet(uint256,uint256)
+          handler: handleMinAndMaxLoanSet
+        - event: MinAndMaxMMRSet(uint256,uint256)
+          handler: handleMinAndMaxMMRSet
+        - event: MinAndMaxTradingFeeSet(uint256,uint256)
+          handler: handleMinAndMaxTradingFeeSet
+        - event: MinHoldingsReqPercentageSet(uint256,indexed address)
+          handler: handleMinHoldingsReqPercentageSet
+        - event: MinLoanSet(uint256,indexed address)
+          handler: handleMinLoanSet
+        - event: PayDebt(indexed address,uint256)
+          handler: handlePayDebt
+        - event: PayInterest(indexed address,uint256,uint256)
+          handler: handlePayInterest
+        - event: RepayLoan(indexed address,uint256,indexed address,uint256)
+          handler: handleRepayLoan
+        - event: TradingFeeSet(uint256,indexed address)
+          handler: handleTradingFeeSet
+        - event: UpdateTheseus(address,address)
+          handler: handleUpdateTheseus
+      file: ./src/loan-pool.ts
+  - kind: ethereum
     name: Staking
     network: goerli
     source:
-      address: "0x8EdC8f028eaE0ACb8276d517D54e2680d57EA697"
+      address: "0x07d1495D080f2C986C9e87C916326eFd2E6c6015"
       abi: Staking
-      startBlock: 9122465
+      startBlock: 9184179
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -38,9 +172,9 @@ dataSources:
     name: TheseusDAO
     network: goerli
     source:
-      address: "0x8FdB0BacA21b8b1617B6A5b720517E0701c338a1"
+      address: "0x831EA4685Fc3b8fF331eB4887070Ba42C15FC8E4"
       abi: TheseusDAO
-      startBlock: 9122465
+      startBlock: 9184178
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -73,65 +207,12 @@ dataSources:
           handler: handleVotingTimeChanged
       file: ./src/theseus-dao.ts
   - kind: ethereum
-    name: Exchange
-    network: goerli
-    source:
-      address: "0x1d67E35482a74661d287686F034dafd39352ccC3"
-      abi: Exchange
-      startBlock: 9122465
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - AddCollateral
-        - AddLiquidity
-        - ClosePosition
-        - Deposit
-        - FfrAdjust
-        - Liquidated
-        - NewPosition
-        - OpenPosition
-        - PayInterest
-        - RemoveCollateral
-        - RemoveLiquidity
-        - Withdraw
-      abis:
-        - name: Exchange
-          file: ./abis/Exchange.json
-      eventHandlers:
-        - event: AddCollateral(bytes,uint256)
-          handler: handleAddCollateral
-        - event: AddLiquidity(indexed bytes,uint256,uint256,int256)
-          handler: handleAddLiquidity
-        - event: ClosePosition(indexed bytes,uint256,uint256,int256)
-          handler: handleClosePosition
-        - event: Deposit(indexed address,uint256)
-          handler: handleDeposit
-        - event: FfrAdjust(bytes,int256)
-          handler: handleFfrAdjust
-        - event: Liquidated(indexed bytes)
-          handler: handleLiquidated
-        - event: NewPosition(indexed bytes,indexed address,indexed address,int256,uint256)
-          handler: handleNewPosition
-        - event: OpenPosition(indexed bytes,uint256,uint256,int256,uint256,uint256)
-          handler: handleOpenPosition
-        - event: PayInterest(bytes,uint256,uint256)
-          handler: handlePayInterest
-        - event: RemoveCollateral(bytes,uint256)
-          handler: handleRemoveCollateral
-        - event: RemoveLiquidity(indexed bytes,int256,int256,int256)
-          handler: handleRemoveLiquidity
-        - event: Withdraw(indexed address,uint256)
-          handler: handleWithdraw
-      file: ./src/exchange.ts
-  - kind: ethereum
     name: CreateAriadnes
     network: goerli
     source:
-      address: "0x1F31e98b4cdF477957727462854f2CAfA57CAF69"
+      address: "0x8A14D2a9669D3cEEc3038A7d7DBBBA49fe517e85"
       abi: CreateAriadnes
-      startBlock: 9122465
+      startBlock: 9184183
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -168,9 +249,9 @@ dataSources:
     name: AmmViewer
     network: goerli
     source:
-      address: "0xbC01aAd4C5256888B965C5Dab56a705708a439B7"
+      address: "0xE1c16CA78CAfD20044238D8A08Cd983249870221"
       abi: AmmViewer
-      startBlock: 9122465
+      startBlock: 9184189
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -205,84 +286,3 @@ dataSources:
         - event: UnFreeze(address)
           handler: handleUnFreeze
       file: ./src/amm-viewer.ts
-  - kind: ethereum
-    name: LoanPool
-    network: goerli
-    source:
-      address: "0xdbAf4a1447A5D76c8255C6F0c098467fDa1C3Da1"
-      abi: LoanPool
-      startBlock: 9122465
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - AddDebt
-        - BorrowAmount
-        - InterestPeriodsSet
-        - LoanInterestRateSet
-        - LoanPoolInitialized
-        - LoanPoolValues
-        - MMRSet
-        - MaxLoanSet
-        - MinAndMaxHoldingsReqPercentageSet
-        - MinAndMaxInterestPeriodsSet
-        - MinAndMaxInterestRateSet
-        - MinAndMaxLoanSet
-        - MinAndMaxMMRSet
-        - MinAndMaxTradingFeeSet
-        - MinHoldingsReqPercentageSet
-        - MinLoanSet
-        - PayDebt
-        - LoanPoolPayInterest
-        - RepayLoan
-        - TradingFeeSet
-        - UpdateTheseus
-      abis:
-        - name: LoanPool
-          file: ./abis/LoanPool.json
-      eventHandlers:
-        - event: AddDebt(indexed address,uint256)
-          handler: handleAddDebt
-        - event: BorrowAmount(bytes,indexed address,uint256)
-          handler: handleBorrowAmount
-        - event: InterestPeriodsSet(uint256,indexed address)
-          handler: handleInterestPeriodsSet
-        - event: LoanInterestRateSet(uint256,indexed address)
-          handler: handleLoanInterestRateSet
-        - event: LoanPoolInitialized(indexed address,indexed address,uint256)
-          handler: handleLoanPoolInitialized
-        - event: LoanPoolValues(indexed
-            address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleLoanPoolValues
-        - event: MMRSet(uint256,indexed address)
-          handler: handleMMRSet
-        - event: MaxLoanSet(uint256,indexed address)
-          handler: handleMaxLoanSet
-        - event: MinAndMaxHoldingsReqPercentageSet(uint256,uint256)
-          handler: handleMinAndMaxHoldingsReqPercentageSet
-        - event: MinAndMaxInterestPeriodsSet(uint256,uint256)
-          handler: handleMinAndMaxInterestPeriodsSet
-        - event: MinAndMaxInterestRateSet(uint256,uint256)
-          handler: handleMinAndMaxInterestRateSet
-        - event: MinAndMaxLoanSet(uint256,uint256)
-          handler: handleMinAndMaxLoanSet
-        - event: MinAndMaxMMRSet(uint256,uint256)
-          handler: handleMinAndMaxMMRSet
-        - event: MinAndMaxTradingFeeSet(uint256,uint256)
-          handler: handleMinAndMaxTradingFeeSet
-        - event: MinHoldingsReqPercentageSet(uint256,indexed address)
-          handler: handleMinHoldingsReqPercentageSet
-        - event: MinLoanSet(uint256,indexed address)
-          handler: handleMinLoanSet
-        - event: PayDebt(indexed address,uint256)
-          handler: handlePayDebt
-        - event: PayInterest(bytes,uint256)
-          handler: handlePayInterest
-        - event: RepayLoan(bytes,indexed address,uint256)
-          handler: handleRepayLoan
-        - event: TradingFeeSet(uint256,indexed address)
-          handler: handleTradingFeeSet
-        - event: UpdateTheseus(address,address)
-          handler: handleUpdateTheseus
-      file: ./src/loan-pool.ts

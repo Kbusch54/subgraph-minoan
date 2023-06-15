@@ -257,6 +257,7 @@
   },
   {
     "inputs": [
+      { "internalType": "bytes", "name": "_payload", "type": "bytes" },
       { "internalType": "bytes32", "name": "_stock", "type": "bytes32" }
     ],
     "name": "getPriceValue",

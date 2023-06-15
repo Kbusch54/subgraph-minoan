@@ -211,21 +211,30 @@ export class AmmViewer extends ethereum.SmartContract {
     return new AmmViewer("AmmViewer", address);
   }
 
-  getPriceValue(_stock: Bytes): BigInt {
+  getPriceValue(_payload: Bytes, _stock: Bytes): BigInt {
     let result = super.call(
       "getPriceValue",
-      "getPriceValue(bytes32):(uint256)",
-      [ethereum.Value.fromFixedBytes(_stock)]
+      "getPriceValue(bytes,bytes32):(uint256)",
+      [
+        ethereum.Value.fromBytes(_payload),
+        ethereum.Value.fromFixedBytes(_stock)
+      ]
     );
 
     return result[0].toBigInt();
   }
 
-  try_getPriceValue(_stock: Bytes): ethereum.CallResult<BigInt> {
+  try_getPriceValue(
+    _payload: Bytes,
+    _stock: Bytes
+  ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "getPriceValue",
-      "getPriceValue(bytes32):(uint256)",
-      [ethereum.Value.fromFixedBytes(_stock)]
+      "getPriceValue(bytes,bytes32):(uint256)",
+      [
+        ethereum.Value.fromBytes(_payload),
+        ethereum.Value.fromFixedBytes(_stock)
+      ]
     );
     if (result.reverted) {
       return new ethereum.CallResult();

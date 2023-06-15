@@ -45,16 +45,20 @@ export class BorrowAmount__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get timestamp(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 
   get amm(): Address {
-    return this._event.parameters[1].value.toAddress();
+    return this._event.parameters[2].value.toAddress();
   }
 
   get amount(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
+    return this._event.parameters[3].value.toBigInt();
   }
 }
 
@@ -429,12 +433,16 @@ export class PayInterest__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get timestamp(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 
   get lastPayed(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
+    return this._event.parameters[2].value.toBigInt();
   }
 }
 
@@ -451,16 +459,20 @@ export class RepayLoan__Params {
     this._event = event;
   }
 
-  get tradeId(): Bytes {
-    return this._event.parameters[0].value.toBytes();
+  get trader(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get timestamp(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 
   get amm(): Address {
-    return this._event.parameters[1].value.toAddress();
+    return this._event.parameters[2].value.toAddress();
   }
 
   get amount(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
+    return this._event.parameters[3].value.toBigInt();
   }
 }
 

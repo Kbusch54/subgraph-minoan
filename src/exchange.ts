@@ -19,7 +19,6 @@ import {
   
   Balance,LoanPool,PoolBalance,Trade,TradeBalance,User } from "../generated/schema"
 import { log } from "matchstick-as";
-import { Contract } from "../generated/Contract/Contract";
  
 //  export  function decodeTradeId(tradeId: Bytes): [Bytes, Bytes, BigInt, BigInt] {
     
@@ -39,12 +38,7 @@ interface TradeID {
 }
 
 export function handleAddCollateral(event: AddCollateralEvent): void {
-   let exCon = ExchangeContract.bind(event.address)
-    let pos = exCon.positions(event.params.tradeId)
-    let sender =pos.getTrader()
-    let amm = pos.getAmm()
-    let timestamp = pos.getTimeStamp()
-  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timestamp.toString())
   let trade = Trade.load(tradeId)
   if(trade){
     trade.startingCost = trade.startingCost.plus(event.params.amount)
@@ -64,15 +58,21 @@ export function handleAddCollateral(event: AddCollateralEvent): void {
   }
   
 }
+// function encode(
+//   trader: Address,
+//   amm: Address,
+//   timestamp: BigInt,
+//   side: string
+// ): Bytes {
+//   let tradeId = ethereum.encode(
+//     [ethereum.Value.fromAddress(trader), ethereum.Value.fromAddress(amm), ethereum.Value.fromUnsignedBigInt(timestamp), ethereum.Value.fromString(side)]
+//   )
+
+//   return tradeId
+// }
 
 export function handleAddLiquidity(event: AddLiquidityEvent): void {
-  //trade 
-  let exCon = ExchangeContract.bind(event.address)
-    let pos = exCon.positions(event.params.tradeId)
-    let sender =pos.getTrader()
-    let timestamp = pos.getTimeStamp()
-
-  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timestamp.toString())
   let trade = Trade.load(tradeId)
   if(trade){
     trade.startingCost = trade.startingCost.plus(event.params.amount)
@@ -91,8 +91,18 @@ export function handleAddLiquidity(event: AddLiquidityEvent): void {
         tradeBalance.interestRate = interestRate
       }
       let exchangeContract = ExchangeContract.bind(event.address)
-      let avgEntryPrice = exchangeContract.positions(event.params.tradeId)
+      let tupleArray: Array<ethereum.Value> = [
+        ethereum.Value.fromAddress(event.params.trader),
+        ethereum.Value.fromAddress(Address.fromBytes(trade.ammPool)),
+        ethereum.Value.fromUnsignedBigInt(event.params.timestamp),
+        ethereum.Value.fromUnsignedBigInt(trade.created),
+      ]
+      let tuple = tupleArray as ethereum.Tuple
+      let encoded = ethereum.encode(ethereum.Value.fromTuple(tuple))!
+
+      let avgEntryPrice = exchangeContract.positions(encoded)
       tradeBalance.entryPrice = avgEntryPrice.value4
+      log.warning("entryPrice: {}", [avgEntryPrice.value4.toString()])
       tradeBalance.save()
     }
     let balance = Balance.load(trade.user)
@@ -108,13 +118,7 @@ export function handleAddLiquidity(event: AddLiquidityEvent): void {
 
 
 export function handleClosePosition(event: ClosePositionEvent): void {
-   // @ts-ignore
-   let exCon = ExchangeContract.bind(event.address)
-    let pos = exCon.positions(event.params.tradeId)
-    let sender =pos.getTrader()
-    let timestamp = pos.getTimeStamp()
-
-  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timestamp.toString())
   let trade = Trade.load(tradeId)
   let exhcnageContract = ExchangeContract.bind(event.address)
   if(trade){
@@ -178,13 +182,8 @@ export function handleDeposit(event: DepositEvent): void {
 }
 
 export function handleFfrAdjust(event: FfrAdjustEvent): void {
-   // @ts-ignore
-   let exCon = ExchangeContract.bind(event.address)
-    let pos = exCon.positions(event.params.tradeId)
-    let sender =pos.getTrader()
-    let timestamp = pos.getTimeStamp()
-
-  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+ 
+    let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timestamp.toString())
   let tradeBalance = TradeBalance.load(tradeId)
   if(tradeBalance){
     tradeBalance.collateral = tradeBalance.collateral.plus(event.params.amount)
@@ -205,80 +204,7 @@ export function handleFfrAdjust(event: FfrAdjustEvent): void {
 
 
 export function handleLiquidated(event: LiquidatedEvent): void {
-   // @ts-ignore
-  //  uint collateral;
-  //  uint loanedAmount;
-  //  int side;
-  //  int positionSize;
-  //  uint entryPrice;
-  //  uint timeStamp;
-  //  uint lastFundingRate;
-  //  address amm;
-  //  address trader;
-   let exCon = ExchangeContract.bind(event.address)
-
-   log.error(
-    'Liquidated: {} tradeId, {} tradeId1, {} tradeId2',
-    [
-      event.params.tradeId.byteLength.toString(),
-      Bytes.fromUint8Array(event.params.tradeId.slice(2, 42)).toHexString(),
-      event.params.tradeId.byteOffset.toString(),
-    ]
-   )
-   log.error(
-    'Man: {} tradeId, {} tradeId1, {} tradeId2 ',
-    [
-      Bytes.fromUint8Array(event.params.tradeId.subarray(26, 66)).toHexString(),
-      Bytes.fromUint8Array(event.params.tradeId.subarray(186, 193)).toHexString(),
-      Bytes.fromUint8Array(event.params.tradeId.subarray(2, 42)).toHex()
-    ]
-   )
-
-    let pos = exCon.positions(event.params.tradeId)
-    let sender =pos.value8
-    let timestamp = pos.value5
-    let amm = pos.value7
-    // let decoded = exCon.try_decodeTradeId(event.params.tradeId)
-    // if(decoded.value){
-
-    //   let psss = decoded.value.getValue0()
-    //   let psss2 = decoded.value.getValue1()
-    //   let psss3 = decoded.value.getValue2()
-    //   let psss4 = decoded.value.getValue3()
-    //   log.error(
-    //     'DecodedTradeId: {} trader {} Amm {} timestamp {} side',
-    //     [
-    //       psss.toHexString(),
-    //       psss2.toHexString(),
-    //       psss3.toString(),
-    //       psss4.toString(),
-    //     ]
-    //     )
-    //   }else{
-    //     log.error(
-    //       'Decoded:{} whyu',
-    //       [
-    //         "I dont know",
-    //       ]
-    //     )
-    //   }
-
-    // log.error(
-    //   'Liquidated: {} trader {} when {} lastFundingRate {} trader2 ',
-    //   [
-    //     pos.getTrader().toHexString(),
-    //     timestamp.toString(),
-    //     pos.value6.toString(),
-    //     pos.value8.toString(),
-    //   ]
-    // );
-    // log.error(
-    //   'Liquidated: {} tradeId ',
-    //   [
-    //     event.params.tradeId.toHexString(),
-    //   ]
-    // );
-  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+    let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timestamp.toString())
   let trade = Trade.load(tradeId)
   if(trade){
     trade.liquidated = true
@@ -301,11 +227,8 @@ export function handleLiquidated(event: LiquidatedEvent): void {
 
 
 export function handleNewPosition(event: NewPositionEvent): void {
- 
-let sender = event.params.trader
-let timestamp = event.params.timeStamp;
 
-let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timeStamp.toString())
   let trade = new Trade(tradeId)
   trade.tradeId = tradeId
   trade.user = event.params.trader
@@ -337,13 +260,9 @@ let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
 
 export function handleOpenPosition(event: OpenPositionEvent): void {
  
-  let exCon = ExchangeContract.bind(event.address)
-  let pos = exCon.positions(event.params.tradeId)
-  // let sender =pos.getTrader()
-  let sender =event.transaction.from
-  let timestamp = event.block.timestamp
+
   // let timestamp = pos.getTimeStamp()
-  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timestamp.toString())
   let tradeBalance = TradeBalance.load(tradeId)
   if(tradeBalance !== null){
     tradeBalance.LastFFRPayed = event.params.lastFundingRate
@@ -385,51 +304,42 @@ export function handleOpenPosition(event: OpenPositionEvent): void {
 
 
 export function handlePayInterest(event: PayInterestEvent): void {
-   // @ts-ignore
-   let exCon = ExchangeContract.bind(event.address)
-    let pos = exCon.positions(event.params.tradeId)
-    let sender =pos.getTrader()
-    let timestamp = pos.getTimeStamp()
-    let amm = pos.getAmm()
-
-  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timestamp.toString())
   let tradeBalance = TradeBalance.load(tradeId)
   if(tradeBalance){
     tradeBalance.collateral = tradeBalance.collateral.minus(event.params.totalAmount)
     tradeBalance.LastInterestPayed = event.block.timestamp
+    tradeBalance.save()
   }
 
-  let balance = Balance.load(sender)
+  let balance = Balance.load(event.params.trader)
   if(balance){
     balance.totalCollateralUsdc = balance.totalCollateralUsdc.minus(event.params.totalAmount)
     balance.save()
   }
-  let poolBal = PoolBalance.load(amm)
-  if(poolBal){
-    poolBal.availableUsdc = poolBal.availableUsdc.plus(event.params.amountToPool)
-    poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.plus(event.params.amountToPool)
-    poolBal.save()
-  }
-  if(event.params.amountToPool !== event.params.totalAmount){
-    let exhcnageCon  = ExchangeContract.bind(event.address)
-    let theseusAdd = exhcnageCon.theseusDao()
-    let theseus = Balance.load(theseusAdd)
-    if(theseus){
-      theseus.availableUsdc = theseus.availableUsdc.plus(event.params.amountToPool)
-      theseus.save()
+  let trade = Trade.load(tradeId)
+  if(trade){
+    let poolBal = PoolBalance.load(trade.ammPool)
+    if(poolBal){
+      poolBal.availableUsdc = poolBal.availableUsdc.plus(event.params.amountToPool)
+      poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.plus(event.params.amountToPool)
+      poolBal.save()
+    }
+    if(event.params.amountToPool !== event.params.totalAmount){
+      let exhcnageCon  = ExchangeContract.bind(event.address)
+      let theseusAdd = exhcnageCon.theseusDao()
+      let theseus = Balance.load(theseusAdd)
+      if(theseus){
+        theseus.availableUsdc = theseus.availableUsdc.plus(event.params.amountToPool)
+        theseus.save()
+      }
     }
   }
 }
 
 
 export function handleRemoveCollateral(event: RemoveCollateralEvent): void {
-   // @ts-ignore
-   let exCon = ExchangeContract.bind(event.address)
-    let pos = exCon.positions(event.params.tradeId)
-    let sender =pos.getTrader()
-    let timestamp = pos.getTimeStamp()
-
-  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timestamp.toString())
   let trade = Trade.load(tradeId)
   if(trade){
     trade.startingCost = trade.startingCost.minus(event.params.amount)
@@ -450,15 +360,7 @@ export function handleRemoveCollateral(event: RemoveCollateralEvent): void {
 
 
 export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
-  //
-  //tradeBalance: loanAmt positionSize
-   // @ts-ignore
-   let exCon = ExchangeContract.bind(event.address)
-    let pos = exCon.positions(event.params.tradeId)
-    let sender =pos.getTrader()
-    let timestamp = pos.getTimeStamp()
-
-  let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
+  let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timestamp.toString())
   let tradeBalance = TradeBalance.load(tradeId)
   if(tradeBalance){
     tradeBalance.loanAmt = tradeBalance.loanAmt.minus(event.params.amountOwed)
@@ -470,7 +372,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
     }
   //balance:  availableUsdc
     
-    let balance = Balance.load(sender)
+    let balance = Balance.load(event.params.trader)
     if(balance){
       balance.availableUsdc = balance.availableUsdc.plus(event.params.usdcReturned).minus(event.params.amountOwed)
       balance.save()
