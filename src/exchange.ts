@@ -19,6 +19,7 @@ import {
   
   Balance,LoanPool,PoolBalance,Trade,TradeBalance,User } from "../generated/schema"
 import { log } from "matchstick-as";
+import { Contract } from "../generated/Contract/Contract";
  
 //  export  function decodeTradeId(tradeId: Bytes): [Bytes, Bytes, BigInt, BigInt] {
     
@@ -36,17 +37,7 @@ interface TradeID {
   timestamp: BigInt;
   side: BigInt;
 }
-export function getTradeId(tradeId: Bytes): string {
-  // Define the types of the data
-  const types = "(address,address, uint256, int256)";
-  // web3.eth.abi.decodeParameters(types, encodedData)
-  // const decoded = ethereum.decode(types, tradeId)!.toTuple()!;
-  // Decode the data
 
-    return ('0x0000000000000_0')
-   
-  
-}
 export function handleAddCollateral(event: AddCollateralEvent): void {
    let exCon = ExchangeContract.bind(event.address)
     let pos = exCon.positions(event.params.tradeId)
@@ -215,16 +206,95 @@ export function handleFfrAdjust(event: FfrAdjustEvent): void {
 
 export function handleLiquidated(event: LiquidatedEvent): void {
    // @ts-ignore
+  //  uint collateral;
+  //  uint loanedAmount;
+  //  int side;
+  //  int positionSize;
+  //  uint entryPrice;
+  //  uint timeStamp;
+  //  uint lastFundingRate;
+  //  address amm;
+  //  address trader;
    let exCon = ExchangeContract.bind(event.address)
-    let pos = exCon.positions(event.params.tradeId)
-    let sender =pos.getTrader()
-    let timestamp = pos.getTimeStamp()
 
+   log.error(
+    'Liquidated: {} tradeId, {} tradeId1, {} tradeId2',
+    [
+      event.params.tradeId.byteLength.toString(),
+      Bytes.fromUint8Array(event.params.tradeId.slice(2, 42)).toHexString(),
+      event.params.tradeId.byteOffset.toString(),
+    ]
+   )
+   log.error(
+    'Man: {} tradeId, {} tradeId1, {} tradeId2 ',
+    [
+      Bytes.fromUint8Array(event.params.tradeId.subarray(26, 66)).toHexString(),
+      Bytes.fromUint8Array(event.params.tradeId.subarray(186, 193)).toHexString(),
+      Bytes.fromUint8Array(event.params.tradeId.subarray(2, 42)).toHex()
+    ]
+   )
+
+    let pos = exCon.positions(event.params.tradeId)
+    let sender =pos.value8
+    let timestamp = pos.value5
+    let amm = pos.value7
+    // let decoded = exCon.try_decodeTradeId(event.params.tradeId)
+    // if(decoded.value){
+
+    //   let psss = decoded.value.getValue0()
+    //   let psss2 = decoded.value.getValue1()
+    //   let psss3 = decoded.value.getValue2()
+    //   let psss4 = decoded.value.getValue3()
+    //   log.error(
+    //     'DecodedTradeId: {} trader {} Amm {} timestamp {} side',
+    //     [
+    //       psss.toHexString(),
+    //       psss2.toHexString(),
+    //       psss3.toString(),
+    //       psss4.toString(),
+    //     ]
+    //     )
+    //   }else{
+    //     log.error(
+    //       'Decoded:{} whyu',
+    //       [
+    //         "I dont know",
+    //       ]
+    //     )
+    //   }
+
+    // log.error(
+    //   'Liquidated: {} trader {} when {} lastFundingRate {} trader2 ',
+    //   [
+    //     pos.getTrader().toHexString(),
+    //     timestamp.toString(),
+    //     pos.value6.toString(),
+    //     pos.value8.toString(),
+    //   ]
+    // );
+    // log.error(
+    //   'Liquidated: {} tradeId ',
+    //   [
+    //     event.params.tradeId.toHexString(),
+    //   ]
+    // );
   let tradeId = sender.toHexString().concat('_').concat(timestamp.toString())
   let trade = Trade.load(tradeId)
   if(trade){
     trade.liquidated = true
     trade.isActive = false
+    trade.save()
+  }else{
+    let trade = new Trade(tradeId)
+    trade.tradeId = tradeId
+    trade.user = Bytes.fromI32(3939393)
+    trade.ammPool = Bytes.fromI32(3939393)
+    trade.vamm = Bytes.fromI32(3939393)
+    trade.isActive = false
+    trade.tradeBalance = tradeId
+    trade.created = BigInt.fromI32(22)
+    trade.liquidated = true
+    trade.startingCost = BigInt.fromI32(22)
     trade.save()
   }
 }

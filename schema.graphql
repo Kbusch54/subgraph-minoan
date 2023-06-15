@@ -18,6 +18,8 @@ type Trade @entity{
   startingCost: BigInt! # uint256
   isActive: Boolean! # bool
   liquidated: Boolean # bool
+  interestPayed: BigInt! # uint256
+  ffrPayed: BigInt! # uint256
 }
 
 type TradeBalance @entity{
@@ -54,6 +56,13 @@ type LoanPool @entity{
   poolToken: PoolToken # PoolToken
   loanPoolTheseus: LoanPoolTheseus # LoanPoolTheseus
   stakes: [Stake!]!@derivedFrom(field: "ammPool") # Stake[]
+  poolPnl:[PoolPnl!]!@derivedFrom(field: "loanPool") # PoolPnl[]
+}
+type PoolPnl @entity{
+  id:Bytes! #ammAddress + timestamp
+  loanPool: LoanPool! # address!
+  timeStamp: BigInt! # uint256
+  amount: BigInt! # int256
 }
 type PoolBalance @entity{
   id:Bytes! #ammAddress
@@ -117,6 +126,7 @@ type Proposal @entity{
   result: Bytes # bytes!
   executor: Bytes # address!
   proposedAt: BigInt! # uint256
+  passedAt: BigInt # uint256
   transactionHash: Bytes! # bytes32
   isPassed: Boolean! # bool
 }
