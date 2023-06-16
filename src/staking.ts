@@ -1,4 +1,4 @@
-import { Address, BigInt, ByteArray, Bytes } from "@graphprotocol/graph-ts"
+import { Address, BigInt, ByteArray, Bytes, log } from "@graphprotocol/graph-ts"
 import {
   AddTokenToPool as AddTokenToPoolEvent,
   FrozenStake as FrozenStakeEvent,
@@ -20,7 +20,7 @@ export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
   poolToken.ammPool = event.params.ammPool
   poolToken.isFrozen = false
   poolToken.save()
-  let theseusAdd = Address.fromString("0x831EA4685Fc3b8fF331eB4887070Ba42C15FC8E4")
+  let theseusAdd = Address.fromString("0x831ea4685fc3b8ff331eb4887070ba42c15fc8e4")
   let theseusToken = PoolToken.load(theseusAdd)
   if(theseusToken == null){
     theseusToken = new PoolToken(theseusAdd)
@@ -55,13 +55,13 @@ export function handleStake(event: StakeEvent): void {
     const tokenId = event.params.tokenId
     stake.token = event.params.ammPool
     stake.tokensOwnedbByUser = BigInt.fromI32(0)
-    if(tokenId == BigInt.fromI32(0)){
+    if(tokenId.equals(BigInt.zero())){
+ 
       stake.theseusDAO = event.params.ammPool
     }else{
       stake.ammPool = event.params.ammPool
     }
     stake.totalStaked = BigInt.fromI32(0)
-    stake.save()
   }
   stake.tokensOwnedbByUser = stake.tokensOwnedbByUser.plus(event.params.tokensMinted)
   stake.totalStaked = stake.totalStaked.plus(event.params.usdcAmount)

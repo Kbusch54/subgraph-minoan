@@ -6,7 +6,7 @@ dataSources:
     name: Exchange
     network: goerli
     source:
-      address: "0x909ABE9609cC77286f5201d6CfFB91aCefC86902"
+      address: "0x909ABE9609cC77286f5201d6CfFB91aCefC86903"
       abi: Exchange
       startBlock: 9184177
     mapping:

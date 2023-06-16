@@ -90,19 +90,6 @@ export function handleAddLiquidity(event: AddLiquidityEvent): void {
         const interestRate = lp.interestRate
         tradeBalance.interestRate = interestRate
       }
-      let exchangeContract = ExchangeContract.bind(event.address)
-      let tupleArray: Array<ethereum.Value> = [
-        ethereum.Value.fromAddress(event.params.trader),
-        ethereum.Value.fromAddress(Address.fromBytes(trade.ammPool)),
-        ethereum.Value.fromUnsignedBigInt(event.params.timestamp),
-        ethereum.Value.fromUnsignedBigInt(trade.created),
-      ]
-      let tuple = tupleArray as ethereum.Tuple
-      let encoded = ethereum.encode(ethereum.Value.fromTuple(tuple))!
-
-      let avgEntryPrice = exchangeContract.positions(encoded)
-      tradeBalance.entryPrice = avgEntryPrice.value4
-      log.warning("entryPrice: {}", [avgEntryPrice.value4.toString()])
       tradeBalance.save()
     }
     let balance = Balance.load(trade.user)
@@ -190,7 +177,7 @@ export function handleFfrAdjust(event: FfrAdjustEvent): void {
     tradeBalance.save()
     let trade = Trade.load(tradeBalance.tradeId)
     if(trade){
-
+      trade.ffrPayed = trade.ffrPayed.plus(event.params.amount)
       let amm = trade.ammPool
       let poolBalance = PoolBalance.load(amm)
       if(poolBalance){
@@ -239,6 +226,8 @@ export function handleNewPosition(event: NewPositionEvent): void {
   trade.created = event.params.timeStamp
   trade.liquidated = false
   trade.startingCost = BigInt.fromI32(0)
+  trade.interestPayed = BigInt.fromI32(0)
+  trade.ffrPayed = BigInt.fromI32(0)
   trade.save()
   let tradeBalance = new TradeBalance(tradeId)
 
@@ -250,6 +239,7 @@ export function handleNewPosition(event: NewPositionEvent): void {
   tradeBalance.positionSize = BigInt.fromI32(0)
   tradeBalance.entryPrice = BigInt.fromI32(0)
   tradeBalance.LastFFRPayed = BigInt.fromI32(0)
+
   tradeBalance.tradeId = tradeId
   tradeBalance.LastInterestPayed = event.params.timeStamp
   tradeBalance.side = event.params.side
@@ -309,6 +299,7 @@ export function handlePayInterest(event: PayInterestEvent): void {
   if(tradeBalance){
     tradeBalance.collateral = tradeBalance.collateral.minus(event.params.totalAmount)
     tradeBalance.LastInterestPayed = event.block.timestamp
+
     tradeBalance.save()
   }
 
@@ -320,6 +311,8 @@ export function handlePayInterest(event: PayInterestEvent): void {
   let trade = Trade.load(tradeId)
   if(trade){
     let poolBal = PoolBalance.load(trade.ammPool)
+    trade.interestPayed = trade.interestPayed.plus(event.params.totalAmount)
+    trade.save()
     if(poolBal){
       poolBal.availableUsdc = poolBal.availableUsdc.plus(event.params.amountToPool)
       poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.plus(event.params.amountToPool)
