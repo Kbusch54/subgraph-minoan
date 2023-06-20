@@ -93,6 +93,7 @@ export function handleExecutedTransaction(
   if(proposal == null){
     proposal = new Proposal(event.params.ariadneDAO.toString().concat('-').concat(event.params.nonce.toString()))
   }
+  proposal.passedAt = event.block.timestamp
   proposal.isPassed = true
   proposal.result = event.params.result
   proposal.executor = event.params.executor
