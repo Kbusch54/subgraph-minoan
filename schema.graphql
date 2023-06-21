@@ -145,6 +145,8 @@ type Stake @entity{
   ammPool: LoanPool # address!
   theseusDAO: TheseusDAO # address!
   token: PoolToken! # PoolToken!
+  singleStakes: [SingleStake!]!@derivedFrom(field: "stake") # Stake[]
+  singleUnstakes: [SingleUnstake!]!@derivedFrom(field: "stake") # Stake[]
 }
 type PoolToken @entity{
   id:Bytes! # ammPool
@@ -212,21 +214,23 @@ type Debt @entity{
   loanPool: LoanPool! # LoanPool
 }
 type SingleStake @entity{
-  id:Bytes!#transactionHash-logIndex
+  id:Bytes!#transactionHash
   user: User! # address!
   ammPool: LoanPool # address
   theseusDAO: TheseusDAO # address
   token: PoolToken! # PoolToken!
   tokensMinted: BigInt! # uint256
   usdcStaked: BigInt! # uint256 usdc
+  stake: Stake! # Stake
 
 }
 type SingleUnstake @entity{
-  id:Bytes! #transactionHash-logIndex
+  id:Bytes! #transactionHash
   user: User! # address!
   ammPool: LoanPool # address
   theseusDAO: TheseusDAO # address
   token: PoolToken! # PoolToken!
   tokensBurned: BigInt! # uint256
   usdcUnstaked: BigInt! # uint256 usdc
+  stake: Stake! # Stake
 }

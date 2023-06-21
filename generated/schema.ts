@@ -1924,6 +1924,22 @@ export class Stake extends Entity {
   set token(value: Bytes) {
     this.set("token", Value.fromBytes(value));
   }
+
+  get singleStakes(): SingleStakeLoader {
+    return new SingleStakeLoader(
+      "Stake",
+      this.get("id")!.toString(),
+      "singleStakes"
+    );
+  }
+
+  get singleUnstakes(): SingleUnstakeLoader {
+    return new SingleUnstakeLoader(
+      "Stake",
+      this.get("id")!.toString(),
+      "singleUnstakes"
+    );
+  }
 }
 
 export class PoolToken extends Entity {
@@ -2799,6 +2815,19 @@ export class SingleStake extends Entity {
   set usdcStaked(value: BigInt) {
     this.set("usdcStaked", Value.fromBigInt(value));
   }
+
+  get stake(): Bytes {
+    let value = this.get("stake");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set stake(value: Bytes) {
+    this.set("stake", Value.fromBytes(value));
+  }
 }
 
 export class SingleUnstake extends Entity {
@@ -2928,6 +2957,19 @@ export class SingleUnstake extends Entity {
 
   set usdcUnstaked(value: BigInt) {
     this.set("usdcUnstaked", Value.fromBigInt(value));
+  }
+
+  get stake(): Bytes {
+    let value = this.get("stake");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set stake(value: Bytes) {
+    this.set("stake", Value.fromBytes(value));
   }
 }
 
