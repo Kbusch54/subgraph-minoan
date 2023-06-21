@@ -9,7 +9,7 @@ import {
 } from "../generated/Staking/Staking"
 import {
   AriadneDAO,PriceData,
-  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stake,TheseusDAO,Trade,TradeBalance,User,VAmm
+  Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stake,TheseusDAO,Trade,TradeBalance,User,VAmm,SingleStake,SingleUnstake
  } from "../generated/schema"
 export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
   //PoolToken: ammPool isFrozen tokenID totalSupply
@@ -43,6 +43,7 @@ export function handleFrozenStake(event: FrozenStakeEvent): void {
 export function handleStake(event: StakeEvent): void {
   //balance: avaialbebalance
   let balance = Balance.load(event.params.user)
+  const tokenId = event.params.tokenId
   if (balance !== null) {
     balance.availableUsdc = balance.availableUsdc.minus(event.params.usdcAmount)
     balance.save()
@@ -52,7 +53,6 @@ export function handleStake(event: StakeEvent): void {
   if (stake == null) {
     stake = new Stake(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
     stake.user = event.params.user
-    const tokenId = event.params.tokenId
     stake.token = event.params.ammPool
     stake.tokensOwnedbByUser = BigInt.fromI32(0)
     if(tokenId.equals(BigInt.zero())){
@@ -79,6 +79,17 @@ export function handleStake(event: StakeEvent): void {
     poolBalance.availableUsdc = poolBalance.availableUsdc.plus(event.params.usdcAmount)
     poolBalance.save()
   }
+  let single = new SingleStake(Bytes.fromHexString(event.transaction.hash.toHex().concat("-").concat(event.logIndex.toString())))
+  single.user = event.params.user
+  if(tokenId.equals(BigInt.zero())){
+    single.theseusDAO = event.params.ammPool
+  }else{
+    single.ammPool = event.params.ammPool
+  }
+  single.usdcStaked = event.params.usdcAmount
+  single.token = event.params.ammPool
+  single.tokensMinted = event.params.tokensMinted
+  single.save()
 }
 
 export function handleUnFrozenStake(event: UnFrozenStakeEvent): void {
@@ -118,5 +129,17 @@ export function handleUnstake(event: UnstakeEvent): void {
     poolBalance.availableUsdc = poolBalance.availableUsdc.minus(event.params.usdcAmount)
     poolBalance.save()
   }
+  let single = new SingleUnstake(Bytes.fromHexString(event.transaction.hash.toHex().concat("-").concat(event.logIndex.toString())))
+  single.user = event.params.user
+  single.usdcUnstaked = event.params.usdcAmount
+  single.token = event.params.ammPool
+  single.tokensBurned = event.params.tokensBurned
+  const tokenId = event.params.tokenId
+  if(tokenId.equals(BigInt.zero())){
+    single.theseusDAO = event.params.ammPool
+  }else{
+    single.ammPool = event.params.ammPool
+  }
+  single.save()
 }
 

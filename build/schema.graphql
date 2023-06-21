@@ -6,6 +6,8 @@ type User @entity {
   balances: Balance! # Balance
   stakes: [Stake!]@derivedFrom(field:"user") # Stake[]
   trades: [Trade!]@derivedFrom(field:"user") # Trade[]
+  singleStakes: [SingleStake!]@derivedFrom(field:"user") # Stake[]
+  singleUnstakes: [SingleUnstake!]@derivedFrom(field:"user") # Stake[]
 }
 type Trade @entity{
   id:String!
@@ -57,6 +59,8 @@ type LoanPool @entity{
   loanPoolTheseus: LoanPoolTheseus # LoanPoolTheseus
   stakes: [Stake!]!@derivedFrom(field: "ammPool") # Stake[]
   poolPnl:[PoolPnl!]!@derivedFrom(field: "loanPool") # PoolPnl[]
+  singleStakes: [SingleStake!]!@derivedFrom(field: "ammPool") # Stake[]
+  singleUnstakes: [SingleUnstake!]!@derivedFrom(field: "ammPool") # Stake[]
 }
 type PoolPnl @entity{
   id:Bytes! #ammAddress + timestamp
@@ -85,6 +89,8 @@ type TheseusDAO @entity{
   insuranceFundMin: BigInt! # uint256
   loanPoolTheseus: LoanPoolTheseus! # LoanPoolTheseus
   stakes: [Stake!]!@derivedFrom(field: "theseusDAO") # Stake[]
+  singleStakes: [SingleStake!]!@derivedFrom(field: "theseusDAO") # Stake[]
+  singleUnstakes: [SingleUnstake!]!@derivedFrom(field: "theseusDAO") # Stake[]
 }
 type LoanPoolTheseus @entity{
   id:Bytes! #num 1
@@ -204,4 +210,23 @@ type Debt @entity{
   id:Bytes!
   amountOwed: BigInt! # uint256
   loanPool: LoanPool! # LoanPool
+}
+type SingleStake @entity{
+  id:Bytes!#transactionHash-logIndex
+  user: User! # address!
+  ammPool: LoanPool # address
+  theseusDAO: TheseusDAO # address
+  token: PoolToken! # PoolToken!
+  tokensMinted: BigInt! # uint256
+  usdcStaked: BigInt! # uint256 usdc
+
+}
+type SingleUnstake @entity{
+  id:Bytes! #transactionHash-logIndex
+  user: User! # address!
+  ammPool: LoanPool # address
+  theseusDAO: TheseusDAO # address
+  token: PoolToken! # PoolToken!
+  tokensBurned: BigInt! # uint256
+  usdcUnstaked: BigInt! # uint256 usdc
 }

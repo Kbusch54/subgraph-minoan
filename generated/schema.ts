@@ -78,22 +78,28 @@ export class User extends Entity {
     this.set("balances", Value.fromBytes(value));
   }
 
-  get stakes(): Array<Bytes> | null {
-    let value = this.get("stakes");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytesArray();
-    }
+  get stakes(): StakeLoader {
+    return new StakeLoader("User", this.get("id")!.toString(), "stakes");
   }
 
-  get trades(): Array<string> | null {
-    let value = this.get("trades");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toStringArray();
-    }
+  get trades(): TradeLoader {
+    return new TradeLoader("User", this.get("id")!.toString(), "trades");
+  }
+
+  get singleStakes(): SingleStakeLoader {
+    return new SingleStakeLoader(
+      "User",
+      this.get("id")!.toString(),
+      "singleStakes"
+    );
+  }
+
+  get singleUnstakes(): SingleUnstakeLoader {
+    return new SingleUnstakeLoader(
+      "User",
+      this.get("id")!.toString(),
+      "singleUnstakes"
+    );
   }
 }
 
@@ -687,13 +693,8 @@ export class LoanPool extends Entity {
     }
   }
 
-  get trades(): Array<string> | null {
-    let value = this.get("trades");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toStringArray();
-    }
+  get trades(): TradeLoader {
+    return new TradeLoader("LoanPool", this.get("id")!.toString(), "trades");
   }
 
   get debt(): Bytes | null {
@@ -747,22 +748,28 @@ export class LoanPool extends Entity {
     }
   }
 
-  get stakes(): Array<Bytes> {
-    let value = this.get("stakes");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
+  get stakes(): StakeLoader {
+    return new StakeLoader("LoanPool", this.get("id")!.toString(), "stakes");
   }
 
-  get poolPnl(): Array<Bytes> {
-    let value = this.get("poolPnl");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
+  get poolPnl(): PoolPnlLoader {
+    return new PoolPnlLoader("LoanPool", this.get("id")!.toString(), "poolPnl");
+  }
+
+  get singleStakes(): SingleStakeLoader {
+    return new SingleStakeLoader(
+      "LoanPool",
+      this.get("id")!.toString(),
+      "singleStakes"
+    );
+  }
+
+  get singleUnstakes(): SingleUnstakeLoader {
+    return new SingleUnstakeLoader(
+      "LoanPool",
+      this.get("id")!.toString(),
+      "singleUnstakes"
+    );
   }
 }
 
@@ -999,13 +1006,12 @@ export class TheseusDAO extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
-  get proposals(): Array<string> {
-    let value = this.get("proposals");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toStringArray();
-    }
+  get proposals(): ProposalLoader {
+    return new ProposalLoader(
+      "TheseusDAO",
+      this.get("id")!.toString(),
+      "proposals"
+    );
   }
 
   get poolToken(): Bytes {
@@ -1125,13 +1131,24 @@ export class TheseusDAO extends Entity {
     this.set("loanPoolTheseus", Value.fromBytes(value));
   }
 
-  get stakes(): Array<Bytes> {
-    let value = this.get("stakes");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
+  get stakes(): StakeLoader {
+    return new StakeLoader("TheseusDAO", this.get("id")!.toString(), "stakes");
+  }
+
+  get singleStakes(): SingleStakeLoader {
+    return new SingleStakeLoader(
+      "TheseusDAO",
+      this.get("id")!.toString(),
+      "singleStakes"
+    );
+  }
+
+  get singleUnstakes(): SingleUnstakeLoader {
+    return new SingleUnstakeLoader(
+      "TheseusDAO",
+      this.get("id")!.toString(),
+      "singleUnstakes"
+    );
   }
 }
 
@@ -1543,13 +1560,12 @@ export class AriadneDAO extends Entity {
     this.set("poolToken", Value.fromBytes(value));
   }
 
-  get proposals(): Array<string> {
-    let value = this.get("proposals");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toStringArray();
-    }
+  get proposals(): ProposalLoader {
+    return new ProposalLoader(
+      "AriadneDAO",
+      this.get("id")!.toString(),
+      "proposals"
+    );
   }
 }
 
@@ -1979,13 +1995,12 @@ export class PoolToken extends Entity {
     this.set("totalSupply", Value.fromBigInt(value));
   }
 
-  get tokenBalance(): Array<Bytes> | null {
-    let value = this.get("tokenBalance");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytesArray();
-    }
+  get tokenBalance(): StakeLoader {
+    return new StakeLoader(
+      "PoolToken",
+      this.get("id")!.toString(),
+      "tokenBalance"
+    );
   }
 
   get ammPool(): Bytes {
@@ -2069,13 +2084,8 @@ export class VAmm extends Entity {
     this.set("loanPool", Value.fromBytes(value));
   }
 
-  get ffrs(): Array<Bytes> {
-    let value = this.get("ffrs");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
+  get ffrs(): FFRLoader {
+    return new FFRLoader("VAmm", this.get("id")!.toString(), "ffrs");
   }
 
   get currentIndex(): BigInt {
@@ -2156,22 +2166,12 @@ export class VAmm extends Entity {
     this.set("payload", Value.fromString(value));
   }
 
-  get snapshots(): Array<Bytes> {
-    let value = this.get("snapshots");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
+  get snapshots(): SnapshotLoader {
+    return new SnapshotLoader("VAmm", this.get("id")!.toString(), "snapshots");
   }
 
-  get priceData(): Array<Bytes> {
-    let value = this.get("priceData");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytesArray();
-    }
+  get priceData(): PriceDataLoader {
+    return new PriceDataLoader("VAmm", this.get("id")!.toString(), "priceData");
   }
 }
 
@@ -2668,5 +2668,427 @@ export class Debt extends Entity {
 
   set loanPool(value: Bytes) {
     this.set("loanPool", Value.fromBytes(value));
+  }
+}
+
+export class SingleStake extends Entity {
+  constructor(id: Bytes) {
+    super();
+    this.set("id", Value.fromBytes(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save SingleStake entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.BYTES,
+        `Entities of type SingleStake must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("SingleStake", id.toBytes().toHexString(), this);
+    }
+  }
+
+  static loadInBlock(id: Bytes): SingleStake | null {
+    return changetype<SingleStake | null>(
+      store.get_in_block("SingleStake", id.toHexString())
+    );
+  }
+
+  static load(id: Bytes): SingleStake | null {
+    return changetype<SingleStake | null>(
+      store.get("SingleStake", id.toHexString())
+    );
+  }
+
+  get id(): Bytes {
+    let value = this.get("id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set id(value: Bytes) {
+    this.set("id", Value.fromBytes(value));
+  }
+
+  get user(): Bytes {
+    let value = this.get("user");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set user(value: Bytes) {
+    this.set("user", Value.fromBytes(value));
+  }
+
+  get ammPool(): Bytes | null {
+    let value = this.get("ammPool");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set ammPool(value: Bytes | null) {
+    if (!value) {
+      this.unset("ammPool");
+    } else {
+      this.set("ammPool", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get theseusDAO(): Bytes | null {
+    let value = this.get("theseusDAO");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set theseusDAO(value: Bytes | null) {
+    if (!value) {
+      this.unset("theseusDAO");
+    } else {
+      this.set("theseusDAO", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get token(): Bytes {
+    let value = this.get("token");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set token(value: Bytes) {
+    this.set("token", Value.fromBytes(value));
+  }
+
+  get tokensMinted(): BigInt {
+    let value = this.get("tokensMinted");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set tokensMinted(value: BigInt) {
+    this.set("tokensMinted", Value.fromBigInt(value));
+  }
+
+  get usdcStaked(): BigInt {
+    let value = this.get("usdcStaked");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set usdcStaked(value: BigInt) {
+    this.set("usdcStaked", Value.fromBigInt(value));
+  }
+}
+
+export class SingleUnstake extends Entity {
+  constructor(id: Bytes) {
+    super();
+    this.set("id", Value.fromBytes(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save SingleUnstake entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.BYTES,
+        `Entities of type SingleUnstake must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("SingleUnstake", id.toBytes().toHexString(), this);
+    }
+  }
+
+  static loadInBlock(id: Bytes): SingleUnstake | null {
+    return changetype<SingleUnstake | null>(
+      store.get_in_block("SingleUnstake", id.toHexString())
+    );
+  }
+
+  static load(id: Bytes): SingleUnstake | null {
+    return changetype<SingleUnstake | null>(
+      store.get("SingleUnstake", id.toHexString())
+    );
+  }
+
+  get id(): Bytes {
+    let value = this.get("id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set id(value: Bytes) {
+    this.set("id", Value.fromBytes(value));
+  }
+
+  get user(): Bytes {
+    let value = this.get("user");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set user(value: Bytes) {
+    this.set("user", Value.fromBytes(value));
+  }
+
+  get ammPool(): Bytes | null {
+    let value = this.get("ammPool");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set ammPool(value: Bytes | null) {
+    if (!value) {
+      this.unset("ammPool");
+    } else {
+      this.set("ammPool", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get theseusDAO(): Bytes | null {
+    let value = this.get("theseusDAO");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set theseusDAO(value: Bytes | null) {
+    if (!value) {
+      this.unset("theseusDAO");
+    } else {
+      this.set("theseusDAO", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get token(): Bytes {
+    let value = this.get("token");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set token(value: Bytes) {
+    this.set("token", Value.fromBytes(value));
+  }
+
+  get tokensBurned(): BigInt {
+    let value = this.get("tokensBurned");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set tokensBurned(value: BigInt) {
+    this.set("tokensBurned", Value.fromBigInt(value));
+  }
+
+  get usdcUnstaked(): BigInt {
+    let value = this.get("usdcUnstaked");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set usdcUnstaked(value: BigInt) {
+    this.set("usdcUnstaked", Value.fromBigInt(value));
+  }
+}
+
+export class StakeLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): Stake[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<Stake[]>(value);
+  }
+}
+
+export class TradeLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): Trade[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<Trade[]>(value);
+  }
+}
+
+export class SingleStakeLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): SingleStake[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<SingleStake[]>(value);
+  }
+}
+
+export class SingleUnstakeLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): SingleUnstake[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<SingleUnstake[]>(value);
+  }
+}
+
+export class PoolPnlLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): PoolPnl[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<PoolPnl[]>(value);
+  }
+}
+
+export class ProposalLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): Proposal[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<Proposal[]>(value);
+  }
+}
+
+export class FFRLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): FFR[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<FFR[]>(value);
+  }
+}
+
+export class SnapshotLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): Snapshot[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<Snapshot[]>(value);
+  }
+}
+
+export class PriceDataLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): PriceData[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<PriceData[]>(value);
   }
 }
