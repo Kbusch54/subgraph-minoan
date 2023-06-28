@@ -76,6 +76,20 @@ export function handleFreeze(event: FreezeEvent): void {
   entity.isFrozen = true
 
   entity.save()
+  let priceDataID = event.params.amm.concatI32(event.block.timestamp.toI32())
+  let priceDataEntity = PriceData.load(priceDataID)
+  if(priceDataEntity == null){
+    priceDataEntity = new PriceData(priceDataID)
+    priceDataEntity.isFrozen = true
+    priceDataEntity.indexPrice = BigInt.fromI32(0)
+    priceDataEntity.vAmm = event.params.amm
+    priceDataEntity.timeStamp = event.block.timestamp
+    priceDataEntity.marketPrice = BigDecimal.zero()
+    priceDataEntity.save()
+  }else{
+    priceDataEntity.isFrozen = true
+    priceDataEntity.save()
+  }
 }
 
 export function handleNewSnappshot(event: NewSnappshotEvent): void {
@@ -167,6 +181,7 @@ export function handlePriceChange(event: PriceChangeEvent): void {
   let priceDataEntity = PriceData.load(priceDataID)
   if(priceDataEntity == null){
     priceDataEntity = new PriceData(priceDataID)
+    priceDataEntity.isFrozen = entity.isFrozen
   }
   priceDataEntity.indexPrice = event.params.indexPrice
   priceDataEntity.vAmm = event.params.amm
@@ -186,6 +201,20 @@ export function handleUnFreeze(event: UnFreezeEvent): void {
     entity = new VAmm(id)
   }
   entity.isFrozen = false
+  let priceDataID = event.params.amm.concatI32(event.block.timestamp.toI32())
+  let priceDataEntity = PriceData.load(priceDataID)
+  if(priceDataEntity == null){
+    priceDataEntity = new PriceData(priceDataID)
+    priceDataEntity.isFrozen = false
+    priceDataEntity.indexPrice = BigInt.fromI32(0)
+    priceDataEntity.vAmm = event.params.amm
+    priceDataEntity.timeStamp = event.block.timestamp
+    priceDataEntity.marketPrice = BigInt.zero().toBigDecimal()
+    priceDataEntity.save()
+  }else{
+    priceDataEntity.isFrozen = false
+    priceDataEntity.save()
+  }
 
   entity.save()
 }

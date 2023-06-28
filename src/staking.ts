@@ -49,9 +49,9 @@ export function handleStake(event: StakeEvent): void {
     balance.save()
   }
   //tokenBalance: tokensOwnedByUser
-  let stake = Stake.load(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
+  let stake = Stake.load(Bytes.fromUTF8(event.params.user.toHexString().concat("-").concat(event.params.ammPool.toHexString())))
   if (stake == null) {
-    stake = new Stake(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
+    stake = new Stake(Bytes.fromUTF8(event.params.user.toHexString().concat("-").concat(event.params.ammPool.toHexString())))
     stake.user = event.params.user
     stake.token = event.params.ammPool
     stake.tokensOwnedbByUser = BigInt.fromI32(0)
@@ -90,6 +90,7 @@ export function handleStake(event: StakeEvent): void {
   single.token = event.params.ammPool
   single.tokensMinted = event.params.tokensMinted
   single.stake = stake.id
+  single.timeStamp = event.block.timestamp
   single.save()
 }
 
@@ -117,7 +118,7 @@ export function handleUnstake(event: UnstakeEvent): void {
     poolToken.save()
   }
   // stakes: totalStaked 
-  let stakes = Stake.load(Bytes.fromUTF8(event.params.user.toString().concat("-").concat(event.params.ammPool.toString())))
+  let stakes = Stake.load(Bytes.fromUTF8(event.params.user.toHexString().concat("-").concat(event.params.ammPool.toHexString())))
   if (stakes !== null) {
     stakes.totalStaked = stakes.totalStaked.minus(event.params.usdcAmount)
     stakes.tokensOwnedbByUser = stakes.tokensOwnedbByUser.minus(event.params.tokensBurned)
@@ -136,6 +137,7 @@ export function handleUnstake(event: UnstakeEvent): void {
   single.token = event.params.ammPool
   single.tokensBurned = event.params.tokensBurned
   const tokenId = event.params.tokenId
+  single.timeStamp = event.block.timestamp
   if(tokenId.equals(BigInt.zero())){
     single.theseusDAO = event.params.ammPool
   }else{

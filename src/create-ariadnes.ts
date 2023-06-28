@@ -89,9 +89,9 @@ export function handleExecutedTransaction(
   event: ExecutedTransactionEvent
 ): void {
 
-  let proposal = Proposal.load(event.params.ariadneDAO.toString().concat('-').concat(event.params.nonce.toString()))
+  let proposal = Proposal.load(event.params.ariadneDAO.toHexString().concat('-').concat(event.params.nonce.toString()))
   if(proposal == null){
-    proposal = new Proposal(event.params.ariadneDAO.toString().concat('-').concat(event.params.nonce.toString()))
+    proposal = new Proposal(event.params.ariadneDAO.toHexString().concat('-').concat(event.params.nonce.toString()))
   }
   proposal.passedAt = event.block.timestamp
   proposal.isPassed = true
@@ -107,7 +107,7 @@ export function handleProposalMade(event: ProposalMadeEvent): void {
     ariadne = new AriadneDAO(id)
   }
   let proposeId = event.params.nonce
-  let proposal = new Proposal(event.params.ariadneDAO.toString().concat('-').concat(proposeId.toString()))
+  let proposal = new Proposal(event.params.ariadneDAO.toHexString().concat('-').concat(proposeId.toString()))
   proposal.dAO = event.params.ariadneDAO
   proposal.nonce = event.params.nonce
   proposal.proposer = event.params.proposer

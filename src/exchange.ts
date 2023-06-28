@@ -17,7 +17,7 @@ import {
 } from "../generated/Exchange/Exchange"
 import {
   
-  Balance,LoanPool,PoolBalance,Trade,TradeBalance,User } from "../generated/schema"
+  Balance,LoanPool,PoolBalance,Trade,TradeBalance,User,TradeOpenValues,CollateralChange,LiquidityChange } from "../generated/schema"
 import { log } from "matchstick-as";
  
 //  export  function decodeTradeId(tradeId: Bytes): [Bytes, Bytes, BigInt, BigInt] {
@@ -56,20 +56,17 @@ export function handleAddCollateral(event: AddCollateralEvent): void {
       tradeBalance.save()
     }
   }
+  let collateralChange = new CollateralChange(event.transaction.hash.toHex())
+  collateralChange.id = event.transaction.hash.toHex()
+  collateralChange.tradeId = tradeId
+  collateralChange.collateralChange = event.params.amount
+  collateralChange.save()
+
+  
+
   
 }
-// function encode(
-//   trader: Address,
-//   amm: Address,
-//   timestamp: BigInt,
-//   side: string
-// ): Bytes {
-//   let tradeId = ethereum.encode(
-//     [ethereum.Value.fromAddress(trader), ethereum.Value.fromAddress(amm), ethereum.Value.fromUnsignedBigInt(timestamp), ethereum.Value.fromString(side)]
-//   )
 
-//   return tradeId
-// }
 
 export function handleAddLiquidity(event: AddLiquidityEvent): void {
   let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timestamp.toString())
@@ -101,6 +98,12 @@ export function handleAddLiquidity(event: AddLiquidityEvent): void {
     }
     trade.save()
   }
+  let liquidityChange = new LiquidityChange(event.transaction.hash.toHex())
+  liquidityChange.id = event.transaction.hash.toHex()
+  liquidityChange.tradeId = tradeId
+  liquidityChange.liquidityChange = event.params.addiotionalPositionSize
+  liquidityChange.collateralChange =  event.params.amount
+  liquidityChange.save()
 }
 
 
@@ -215,6 +218,7 @@ export function handleLiquidated(event: LiquidatedEvent): void {
 
 export function handleNewPosition(event: NewPositionEvent): void {
 
+ 
   let tradeId = event.params.trader.toHexString().concat('_').concat(event.params.timeStamp.toString())
   let trade = new Trade(tradeId)
   trade.tradeId = tradeId
@@ -228,6 +232,9 @@ export function handleNewPosition(event: NewPositionEvent): void {
   trade.startingCost = BigInt.fromI32(0)
   trade.interestPayed = BigInt.fromI32(0)
   trade.ffrPayed = BigInt.fromI32(0)
+    
+  let tradeOpen = new TradeOpenValues(tradeId)
+  trade.tradeOpenValues = tradeId
   trade.save()
   let tradeBalance = new TradeBalance(tradeId)
 
@@ -245,6 +252,16 @@ export function handleNewPosition(event: NewPositionEvent): void {
   tradeBalance.side = event.params.side
 
   tradeBalance.save()
+
+  tradeOpen.openCollateral =BigInt.fromI32(0)
+  tradeOpen.openValue = BigInt.fromI32(0)
+  tradeOpen.openPositionSize = BigInt.fromI32(0)
+  tradeOpen.openLeverage = BigInt.fromI32(0)
+  tradeOpen.openEntryPrice = BigInt.fromI32(0)
+  tradeOpen.openInterestRate = BigInt.fromI32(0)
+  tradeOpen.openLoanAmt = BigInt.fromI32(0)
+  tradeOpen.tradeId = tradeId
+  tradeOpen.save()
 }
 
 
@@ -285,10 +302,22 @@ export function handleOpenPosition(event: OpenPositionEvent): void {
           }
           balance.save()
         }
+        let tradeOpen = TradeOpenValues.load(tradeId)
+        if(tradeOpen){
+          tradeOpen.openCollateral = event.params.collateral
+          tradeOpen.openValue = event.params.positionSize.times(event.params.entryPrice)
+          tradeOpen.openPositionSize = event.params.positionSize
+          tradeOpen.openLeverage = event.params.loanAmt.div(event.params.collateral)
+          tradeOpen.openEntryPrice = event.params.entryPrice
+          tradeOpen.openInterestRate = interestRate
+          tradeOpen.openLoanAmt = event.params.loanAmt
+          tradeOpen.save()
+        }
       }     
     }
     tradeBalance.save()
   }
+
 }
 
 
@@ -347,6 +376,11 @@ export function handleRemoveCollateral(event: RemoveCollateralEvent): void {
       balance.save()
       tradeBalance.save()
     }
+    let collateralChange = new CollateralChange(event.transaction.hash.toHex())
+    collateralChange.id = event.transaction.hash.toHex()
+    collateralChange.tradeId = tradeId
+    collateralChange.collateralChange = event.params.amount.times(BigInt.fromI32(-1))
+    collateralChange.save()
   }
 }
 
@@ -371,20 +405,29 @@ export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
       balance.save()
     }
   //poolBalance: totalusdcSupply availableUsdc
-    let amm = Bytes.fromHexString(tradeId.slice(20, 40).toString());
+    let trade = Trade.load(tradeId)
+    if(trade){
+      let amm = trade.vamm 
     let poolBal = PoolBalance.load(amm)
     const pnl = event.params.usdcReturned.minus(event.params.amountOwed)
     if(poolBal){
       if(pnl > BigInt.fromI32(0)){
-      poolBal.availableUsdc = poolBal.availableUsdc.minus(pnl)
-      poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.minus(pnl)
+        poolBal.availableUsdc = poolBal.availableUsdc.minus(pnl)
+        poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.minus(pnl)
       }else{
         tradeBalance.collateral = tradeBalance.collateral.minus(pnl)
       }
-    poolBal.save()
+      poolBal.save()
     }
+  }
     tradeBalance.save()
   }
+  let liquidityChange = new LiquidityChange(event.transaction.hash.toHex())
+  liquidityChange.id = event.transaction.hash.toHex()
+  liquidityChange.tradeId = tradeId
+  liquidityChange.liquidityChange = event.params.positionSizeRemoved.times(BigInt.fromI32(-1))
+  liquidityChange.collateralChange =  (event.params.usdcReturned.minus(event.params.amountOwed)).times(BigInt.fromI32(-1))
+  liquidityChange.save()
 }
 
 

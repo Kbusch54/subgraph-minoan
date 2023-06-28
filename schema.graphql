@@ -21,7 +21,34 @@ type Trade @entity{
   isActive: Boolean! # bool
   liquidated: Boolean # bool
   interestPayed: BigInt! # uint256
+  tradeOpenValues: TradeOpenValues! # TradeOpenValues
   ffrPayed: BigInt! # uint256
+  collateralChange: [CollateralChange!]!@derivedFrom(field:"tradeId") # CollateralChange
+  liquidityChange: [LiquidityChange!]!@derivedFrom(field:"tradeId")# LiquidityChange
+}
+type TradeOpenValues @entity{
+  id:String!
+  tradeId: String! # bytes!
+  openValue: BigInt! # uint256
+  openLoanAmt: BigInt! # uint256
+  openCollateral: BigInt! # uint256
+  openLeverage: BigInt! # uint256
+  openEntryPrice: BigInt! # uint256
+  openPositionSize: BigInt! # int256
+  openInterestRate: BigInt! # uint256
+
+}
+type CollateralChange @entity{
+  id:String!
+  tradeId: Trade! # bytes!
+  collateralChange: BigInt! # uint256
+}
+
+type LiquidityChange @entity{
+  id:String!
+  tradeId: Trade! # bytes!
+  liquidityChange: BigInt! # uint256
+  collateralChange: BigInt! # uint256
 }
 
 type TradeBalance @entity{
@@ -197,6 +224,7 @@ type PriceData @entity(immutable: true){
   vAmm: VAmm! # VAmm!
   marketPrice: BigDecimal! 
   indexPrice: BigInt! # uint256
+  isFrozen: Boolean! # bool
 }
 
 type Balance @entity{
@@ -222,6 +250,7 @@ type SingleStake @entity{
   tokensMinted: BigInt! # uint256
   usdcStaked: BigInt! # uint256 usdc
   stake: Stake! # Stake
+  timeStamp: BigInt! # uint256
 
 }
 type SingleUnstake @entity{
@@ -233,4 +262,5 @@ type SingleUnstake @entity{
   tokensBurned: BigInt! # uint256
   usdcUnstaked: BigInt! # uint256 usdc
   stake: Stake! # Stake
+  timeStamp: BigInt! # uint256
 }

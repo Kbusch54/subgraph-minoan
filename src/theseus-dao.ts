@@ -14,7 +14,7 @@ import {
  } from "../generated/schema"
 
 export function handleExecuteTransaction(event: ExecuteTransactionEvent): void {
-  let proposalId = event.address.toString().concat('-').concat(event.params.nonce.toString())
+  let proposalId = event.address.toHexString().concat('-').concat(event.params.nonce.toString())
   let proposal = Proposal.load(proposalId)
   if (proposal == null) {
     proposal = new Proposal(proposalId)
@@ -75,7 +75,7 @@ export function handleProposalMade(event: ProposalMadeEvent): void {
     theseus.loanPoolTheseus = event.address
   }
   let proposeId = event.params.nonce
-  let proposal = new Proposal(event.address.toString().concat('-').concat(proposeId.toString()))
+  let proposal = new Proposal(event.address.toHexString().concat('-').concat(proposeId.toString()))
   proposal.theseusDAO = event.address
   proposal.nonce = event.params.nonce
   proposal.proposer = event.params.proposer
