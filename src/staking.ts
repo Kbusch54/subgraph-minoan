@@ -20,7 +20,7 @@ export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
   poolToken.ammPool = event.params.ammPool
   poolToken.isFrozen = false
   poolToken.save()
-  let theseusAdd = Address.fromString("0x831ea4685fc3b8ff331eb4887070ba42c15fc8e4")
+  let theseusAdd = Address.fromString("0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d")
   let theseusToken = PoolToken.load(theseusAdd)
   if(theseusToken == null){
     theseusToken = new PoolToken(theseusAdd)

@@ -181,7 +181,7 @@ export function handleMinAndMaxHoldingsReqPercentageSet(
   let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
     let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x831ea4685fc3b8ff331eb4887070ba42c15fc8e4') 
+    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d') 
     theseus.minHoldingsReqPercentage = event.params._minHoldingsReqPercentage
     theseus.save()
   }else{
@@ -198,7 +198,7 @@ export function handleMinAndMaxInterestPeriodsSet(
   let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
     let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x831ea4685fc3b8ff331eb4887070ba42c15fc8e4') 
+    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d') 
     theseus.minInterestPeriod = event.params._minInterestPeriods
     theseus.maxInterestPeriod = event.params._maxInterestPeriods
     theseus.save()
@@ -217,7 +217,7 @@ export function handleMinAndMaxInterestRateSet(
     let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
     if(theseus == null){
       let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x831ea4685fc3b8ff331eb4887070ba42c15fc8e4') 
+    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d') 
       
       theseus.minInterestRate = event.params._minInterestRate
       theseus.maxInterestRate = event.params._maxInterestRate
@@ -235,7 +235,7 @@ export function handleMinAndMaxLoanSet(event: MinAndMaxLoanSetEvent): void {
   let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
     let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x831ea4685fc3b8ff331eb4887070ba42c15fc8e4') 
+    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d') 
      
     theseus.minLoan = event.params._minLoan
     theseus.maxLoan = event.params._maxLoan
@@ -252,7 +252,7 @@ export function handleMinAndMaxMMRSet(event: MinAndMaxMMRSetEvent): void {
   let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
     let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x831ea4685fc3b8ff331eb4887070ba42c15fc8e4') 
+    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d') 
     theseus.minMMR = event.params._minMMR
     theseus.maxMMR = event.params._maxMMR
     theseus.save()
@@ -270,7 +270,7 @@ export function handleMinAndMaxTradingFeeSet(
   let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
     let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x831ea4685fc3b8ff331eb4887070ba42c15fc8e4')  
+    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d')  
     theseus.minTradingFee = event.params._minTradingFee
     theseus.maxTradingFee = event.params._maxTradingFee
     theseus.save()

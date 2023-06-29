@@ -260,6 +260,7 @@ export function handleNewPosition(event: NewPositionEvent): void {
   tradeOpen.openEntryPrice = BigInt.fromI32(0)
   tradeOpen.openInterestRate = BigInt.fromI32(0)
   tradeOpen.openLoanAmt = BigInt.fromI32(0)
+  tradeOpen.tradingFee= BigInt.fromI32(0)
   tradeOpen.tradeId = tradeId
   tradeOpen.save()
 }
@@ -305,12 +306,13 @@ export function handleOpenPosition(event: OpenPositionEvent): void {
         let tradeOpen = TradeOpenValues.load(tradeId)
         if(tradeOpen){
           tradeOpen.openCollateral = event.params.collateral
-          tradeOpen.openValue = event.params.positionSize.times(event.params.entryPrice)
+          tradeOpen.openValue = event.params.positionSize.times(event.params.entryPrice).div(BigInt.fromI32(10).pow(8))
           tradeOpen.openPositionSize = event.params.positionSize
           tradeOpen.openLeverage = event.params.loanAmt.div(event.params.collateral)
           tradeOpen.openEntryPrice = event.params.entryPrice
           tradeOpen.openInterestRate = interestRate
           tradeOpen.openLoanAmt = event.params.loanAmt
+          tradeOpen.tradingFee= event.params.loanAmt.times(tradingFee).div(BigInt.fromI32(10).pow(6))
           tradeOpen.save()
         }
       }     

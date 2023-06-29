@@ -459,6 +459,19 @@ export class TradeOpenValues extends Entity {
   set openInterestRate(value: BigInt) {
     this.set("openInterestRate", Value.fromBigInt(value));
   }
+
+  get tradingFee(): BigInt {
+    let value = this.get("tradingFee");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set tradingFee(value: BigInt) {
+    this.set("tradingFee", Value.fromBigInt(value));
+  }
 }
 
 export class CollateralChange extends Entity {

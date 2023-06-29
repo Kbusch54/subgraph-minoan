@@ -36,6 +36,7 @@ type TradeOpenValues @entity{
   openEntryPrice: BigInt! # uint256
   openPositionSize: BigInt! # int256
   openInterestRate: BigInt! # uint256
+  tradingFee: BigInt! # uint256
 
 }
 type CollateralChange @entity{
