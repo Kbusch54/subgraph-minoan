@@ -1113,9 +1113,9 @@ export class LoanPool extends Entity {
 }
 
 export class PoolPnl extends Entity {
-  constructor(id: Bytes) {
+  constructor(id: string) {
     super();
-    this.set("id", Value.fromBytes(id));
+    this.set("id", Value.fromString(id));
   }
 
   save(): void {
@@ -1123,34 +1123,32 @@ export class PoolPnl extends Entity {
     assert(id != null, "Cannot save PoolPnl entity without an ID");
     if (id) {
       assert(
-        id.kind == ValueKind.BYTES,
-        `Entities of type PoolPnl must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        id.kind == ValueKind.STRING,
+        `Entities of type PoolPnl must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
       );
-      store.set("PoolPnl", id.toBytes().toHexString(), this);
+      store.set("PoolPnl", id.toString(), this);
     }
   }
 
-  static loadInBlock(id: Bytes): PoolPnl | null {
-    return changetype<PoolPnl | null>(
-      store.get_in_block("PoolPnl", id.toHexString())
-    );
+  static loadInBlock(id: string): PoolPnl | null {
+    return changetype<PoolPnl | null>(store.get_in_block("PoolPnl", id));
   }
 
-  static load(id: Bytes): PoolPnl | null {
-    return changetype<PoolPnl | null>(store.get("PoolPnl", id.toHexString()));
+  static load(id: string): PoolPnl | null {
+    return changetype<PoolPnl | null>(store.get("PoolPnl", id));
   }
 
-  get id(): Bytes {
+  get id(): string {
     let value = this.get("id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set id(value: Bytes) {
-    this.set("id", Value.fromBytes(value));
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
   }
 
   get loanPool(): Bytes {

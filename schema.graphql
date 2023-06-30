@@ -91,7 +91,7 @@ type LoanPool @entity{
   singleUnstakes: [SingleUnstake!]!@derivedFrom(field: "ammPool") # Stake[]
 }
 type PoolPnl @entity{
-  id:Bytes! #ammAddress + timestamp
+  id:String! #ammAddress + timestamp
   loanPool: LoanPool! # address!
   timeStamp: BigInt! # uint256
   amount: BigInt! # int256
