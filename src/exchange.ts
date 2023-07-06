@@ -16,7 +16,7 @@ import {
   Exchange as ExchangeContract
 } from "../generated/Exchange/Exchange"
 import {
-  Balance,LoanPool,PoolBalance,Trade,TradeBalance,User,TradeOpenValues,CollateralChange,LiquidityChange, PoolPnl } from "../generated/schema"
+  Balance,LoanPool,PoolBalance,Trade,TradeBalance,User,TradeOpenValues,CollateralChange,LiquidityChange, PoolPnl, TheseusDAO } from "../generated/schema"
 import { log } from "matchstick-as";
 
 
@@ -152,25 +152,32 @@ export function handleClosePosition(event: ClosePositionEvent): void {
 
 
 export function handleDeposit(event: DepositEvent): void {
-  let user = User.load(event.params.user)
-  let balance = Balance.load(event.params.user)
-  if (user == null) {
-    user = new User(event.params.user)
-    user.address = event.params.user
-    user.balances = event.params.user
-    user.save()
-  }
-  if(balance == null){
-    balance = new Balance(event.params.user)
-    balance.user = event.params.user
-    balance.availableUsdc = event.params.amount
-    balance.totalCollateralUsdc = BigInt.fromI32(0)
-    balance.save()
+  if(event.params.user == Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d')){
+    let thes = TheseusDAO.load(Bytes.fromHexString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d'));
+    if(thes){
+      thes.insuranceFund = thes.insuranceFund.plus(event.params.amount)
+      thes.save()
+    }
   }else{
-    balance.availableUsdc = balance.availableUsdc.plus(event.params.amount)
-    balance.save()
+    let user = User.load(event.params.user)
+    let balance = Balance.load(event.params.user)
+    if (user == null) {
+      user = new User(event.params.user)
+      user.address = event.params.user
+      user.balances = event.params.user
+      user.save()
+    }
+    if(balance == null){
+      balance = new Balance(event.params.user)
+      balance.user = event.params.user
+      balance.availableUsdc = event.params.amount
+      balance.totalCollateralUsdc = BigInt.fromI32(0)
+      balance.save()
+    }else{
+      balance.availableUsdc = balance.availableUsdc.plus(event.params.amount)
+      balance.save()
+    }
   }
-
 }
 
 export function handleFfrAdjust(event: FfrAdjustEvent): void {
@@ -470,10 +477,18 @@ export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
 
 
 export function handleWithdraw(event: WithdrawEvent): void {
-  let balance = Balance.load(event.params.user)
-  if(balance !=null){
-    balance.availableUsdc = balance.availableUsdc.minus(event.params.amount)
-    balance.save()
+  if(event.params.user == Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d')){
+    let thes = TheseusDAO.load(Bytes.fromHexString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d'));
+    if(thes){ 
+      thes.insuranceFund = thes.insuranceFund.minus(event.params.amount)
+      thes.save()
+    }
+  }else{
+    let balance = Balance.load(event.params.user)
+    if(balance !=null){
+      balance.availableUsdc = balance.availableUsdc.minus(event.params.amount)
+      balance.save()
+    }
   }
 
 }

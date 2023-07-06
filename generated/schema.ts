@@ -1455,6 +1455,19 @@ export class TheseusDAO extends Entity {
     this.set("insuranceFundMin", Value.fromBigInt(value));
   }
 
+  get insuranceFund(): BigInt {
+    let value = this.get("insuranceFund");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set insuranceFund(value: BigInt) {
+    this.set("insuranceFund", Value.fromBigInt(value));
+  }
+
   get loanPoolTheseus(): Bytes {
     let value = this.get("loanPoolTheseus");
     if (!value || value.kind == ValueKind.NULL) {

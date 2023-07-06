@@ -60,6 +60,11 @@ export function handleAddDebt(event: AddDebtEvent): void {
     balacne.availableUsdc = balacne.availableUsdc.minus(event.params.amount)
     balacne.save()
   }
+  let theseus = TheseusDAO.load(Bytes.fromHexString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d'))
+  if (theseus) {
+    theseus.insuranceFund = theseus.insuranceFund.minus(event.params.amount)
+    theseus.save()
+  }
 }
 
 export function handleUpdateTheseus(event: UpdateTheseusEvent): void {
@@ -317,6 +322,11 @@ export function handlePayDebt(event: PayDebtEvent): void {
   if (balacne) {
     balacne.availableUsdc = balacne.availableUsdc.plus(event.params.amount)
     balacne.save()
+  }
+  let theseus = TheseusDAO.load(Bytes.fromHexString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d'))
+  if (theseus) {
+    theseus.insuranceFund = theseus.insuranceFund.plus(event.params.amount)
+    theseus.save()
   }
 
 }
