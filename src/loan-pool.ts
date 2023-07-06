@@ -30,7 +30,7 @@ import {
   Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stake,TheseusDAO,Trade,TradeBalance,User,VAmm
  } from "../generated/schema"
 
-
+export const theseusAdd ='0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d'
 
 export function handleAddDebt(event: AddDebtEvent): void {
   //debt: totalDebt
@@ -60,7 +60,7 @@ export function handleAddDebt(event: AddDebtEvent): void {
     balacne.availableUsdc = balacne.availableUsdc.minus(event.params.amount)
     balacne.save()
   }
-  let theseus = TheseusDAO.load(Bytes.fromHexString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d'))
+  let theseus = TheseusDAO.load(Bytes.fromHexString(theseusAdd))
   if (theseus) {
     theseus.insuranceFund = theseus.insuranceFund.minus(event.params.amount)
     theseus.save()
@@ -186,7 +186,7 @@ export function handleMinAndMaxHoldingsReqPercentageSet(
   let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
     let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d') 
+    theseus.theseusDAO = Address.fromString(theseusAdd) 
     theseus.minHoldingsReqPercentage = event.params._minHoldingsReqPercentage
     theseus.save()
   }else{
@@ -203,7 +203,7 @@ export function handleMinAndMaxInterestPeriodsSet(
   let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
     let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d') 
+    theseus.theseusDAO = Address.fromString(theseusAdd) 
     theseus.minInterestPeriod = event.params._minInterestPeriods
     theseus.maxInterestPeriod = event.params._maxInterestPeriods
     theseus.save()
@@ -222,7 +222,7 @@ export function handleMinAndMaxInterestRateSet(
     let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
     if(theseus == null){
       let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d') 
+    theseus.theseusDAO = Address.fromString(theseusAdd) 
       
       theseus.minInterestRate = event.params._minInterestRate
       theseus.maxInterestRate = event.params._maxInterestRate
@@ -240,7 +240,7 @@ export function handleMinAndMaxLoanSet(event: MinAndMaxLoanSetEvent): void {
   let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
     let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d') 
+    theseus.theseusDAO = Address.fromString(theseusAdd) 
      
     theseus.minLoan = event.params._minLoan
     theseus.maxLoan = event.params._maxLoan
@@ -257,7 +257,7 @@ export function handleMinAndMaxMMRSet(event: MinAndMaxMMRSetEvent): void {
   let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
     let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d') 
+    theseus.theseusDAO = Address.fromString(theseusAdd) 
     theseus.minMMR = event.params._minMMR
     theseus.maxMMR = event.params._maxMMR
     theseus.save()
@@ -275,7 +275,7 @@ export function handleMinAndMaxTradingFeeSet(
   let theseus = LoanPoolTheseus.load(Bytes.fromI32(1))
   if(theseus == null){
     let theseus = new LoanPoolTheseus(Bytes.fromI32(1))
-    theseus.theseusDAO = Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d')  
+    theseus.theseusDAO = Address.fromString(theseusAdd)  
     theseus.minTradingFee = event.params._minTradingFee
     theseus.maxTradingFee = event.params._maxTradingFee
     theseus.save()
@@ -323,7 +323,7 @@ export function handlePayDebt(event: PayDebtEvent): void {
     balacne.availableUsdc = balacne.availableUsdc.plus(event.params.amount)
     balacne.save()
   }
-  let theseus = TheseusDAO.load(Bytes.fromHexString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d'))
+  let theseus = TheseusDAO.load(Bytes.fromHexString(theseusAdd))
   if (theseus) {
     theseus.insuranceFund = theseus.insuranceFund.plus(event.params.amount)
     theseus.save()

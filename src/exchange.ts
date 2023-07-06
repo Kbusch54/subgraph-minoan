@@ -18,6 +18,7 @@ import {
 import {
   Balance,LoanPool,PoolBalance,Trade,TradeBalance,User,TradeOpenValues,CollateralChange,LiquidityChange, PoolPnl, TheseusDAO } from "../generated/schema"
 import { log } from "matchstick-as";
+import { theseusAdd } from "./loan-pool";
 
 
 interface TradeID {
@@ -152,8 +153,8 @@ export function handleClosePosition(event: ClosePositionEvent): void {
 
 
 export function handleDeposit(event: DepositEvent): void {
-  if(event.params.user == Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d')){
-    let thes = TheseusDAO.load(Bytes.fromHexString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d'));
+  if(event.params.user == Address.fromString(theseusAdd)){
+    let thes = TheseusDAO.load(Bytes.fromHexString(theseusAdd));
     if(thes){
       thes.insuranceFund = thes.insuranceFund.plus(event.params.amount)
       thes.save()
@@ -477,8 +478,8 @@ export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
 
 
 export function handleWithdraw(event: WithdrawEvent): void {
-  if(event.params.user == Address.fromString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d')){
-    let thes = TheseusDAO.load(Bytes.fromHexString('0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d'));
+  if(event.params.user == Address.fromString(theseusAdd)){
+    let thes = TheseusDAO.load(Bytes.fromHexString(theseusAdd));
     if(thes){ 
       thes.insuranceFund = thes.insuranceFund.minus(event.params.amount)
       thes.save()
