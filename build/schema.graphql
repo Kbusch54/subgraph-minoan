@@ -115,6 +115,7 @@ type TheseusDAO @entity{
   tokenId: BigInt! # uint256
   votesNeededPercentage: BigInt! # uint256
   insuranceFundMin: BigInt! # uint256
+  insuranceFund: BigInt! # uint256
   loanPoolTheseus: LoanPoolTheseus! # LoanPoolTheseus
   stakes: [Stake!]!@derivedFrom(field: "theseusDAO") # Stake[]
   singleStakes: [SingleStake!]!@derivedFrom(field: "theseusDAO") # Stake[]

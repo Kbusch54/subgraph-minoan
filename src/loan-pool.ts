@@ -30,7 +30,7 @@ import {
   Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stake,TheseusDAO,Trade,TradeBalance,User,VAmm
  } from "../generated/schema"
 
-export const theseusAdd ='0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d'
+export const theseusAdd ='0xC739eC1BF33C6E09468FF033A35f6A957F44af93'
 
 export function handleAddDebt(event: AddDebtEvent): void {
   //debt: totalDebt

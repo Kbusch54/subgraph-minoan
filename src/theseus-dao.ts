@@ -71,6 +71,7 @@ export function handleProposalMade(event: ProposalMadeEvent): void {
     theseus.votingTime = conract.votingTime()
     theseus.tokenId = BigInt.fromI32(0)
     theseus.insuranceFundMin = conract.insuranceFundMin()
+    theseus.insuranceFund = BigInt.fromI32(0)
     theseus.poolToken = event.address
     theseus.loanPoolTheseus = event.address
   }
