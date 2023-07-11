@@ -11,6 +11,7 @@ import {
   AriadneDAO,PriceData,
   Balance,Debt,FFR,LoanPool,LoanPoolTheseus,PoolBalance,PoolToken,Proposal,Snapshot,Stake,TheseusDAO,Trade,TradeBalance,User,VAmm,SingleStake,SingleUnstake
  } from "../generated/schema"
+import { theseusAdd } from "./loan-pool"
 export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
   //PoolToken: ammPool isFrozen tokenID totalSupply
   
@@ -20,13 +21,13 @@ export function handleAddTokenToPool(event: AddTokenToPoolEvent): void {
   poolToken.ammPool = event.params.ammPool
   poolToken.isFrozen = false
   poolToken.save()
-  let theseusAdd = Address.fromString("0x9971256545fe1eE74B224b3D0cA5B4e6DDc3283d")
-  let theseusToken = PoolToken.load(theseusAdd)
+  let theseus = Bytes.fromHexString(theseusAdd)
+  let theseusToken = PoolToken.load(theseus)
   if(theseusToken == null){
-    theseusToken = new PoolToken(theseusAdd)
+    theseusToken = new PoolToken(theseus)
     theseusToken.tokenId = BigInt.fromI32(0)
     theseusToken.totalSupply = BigInt.fromI32(0)
-    theseusToken.ammPool = theseusAdd
+    theseusToken.ammPool = theseus
     theseusToken.isFrozen = false
     theseusToken.save()
   }
