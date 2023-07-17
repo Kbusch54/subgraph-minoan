@@ -49,6 +49,31 @@ export function handleStake(event: StakeEvent): void {
     balance.availableUsdc = balance.availableUsdc.minus(event.params.usdcAmount)
     balance.save()
   }
+  if(event.params.ammPool == Address.fromHexString(theseusAdd)){
+    log.warning("theseusDAO marked for death {}",[
+      event.params.ammPool.toHexString()
+    ])
+    let theseus = TheseusDAO.load(Bytes.fromHexString(theseusAdd))
+    
+    if(theseus == null){
+      let id = Bytes.fromHexString(theseusAdd)
+      theseus = new TheseusDAO(id)
+      theseus.currentId = BigInt.fromI32(0)
+      theseus.maxVotingPower = BigInt.fromI32(0)
+      theseus.votesNeededPercentage = BigInt.fromI32(7500)
+      theseus.minVotingPower = BigInt.fromI32(1)
+      theseus.votingTime = BigInt.fromI32(7200)
+      theseus.tokenId = BigInt.fromI32(0)
+      theseus.insuranceFundMin = BigInt.fromI32(0)
+      theseus.insuranceFund = event.params.usdcAmount
+      theseus.poolToken = id
+      theseus.loanPoolTheseus = id
+      theseus.save()
+    }else{
+      theseus.insuranceFund = theseus.insuranceFund.plus(event.params.usdcAmount)
+      theseus.save()
+    }
+  }
   //tokenBalance: tokensOwnedByUser
   let stake = Stake.load(Bytes.fromUTF8(event.params.user.toHexString().concat("-").concat(event.params.ammPool.toHexString())))
   if (stake == null) {
@@ -117,6 +142,13 @@ export function handleUnstake(event: UnstakeEvent): void {
   if (poolToken !== null) {
     poolToken.totalSupply = poolToken.totalSupply.minus(event.params.tokensBurned)
     poolToken.save()
+  }
+  if(event.params.ammPool.toHexString() == theseusAdd){
+    let theseus = TheseusDAO.load(Bytes.fromHexString(theseusAdd))
+    if(theseus){
+    theseus.insuranceFund = theseus.insuranceFund.plus(event.params.usdcAmount)
+      theseus.save()
+    }
   }
   // stakes: totalStaked 
   let stakes = Stake.load(Bytes.fromUTF8(event.params.user.toHexString().concat("-").concat(event.params.ammPool.toHexString())))

@@ -61,10 +61,10 @@ export function handleMinVotingPowerChanged(
 export function handleProposalMade(event: ProposalMadeEvent): void {
   let id = event.address
   let theseus = TheseusDAO.load(id)
+  let conract = TheseusDAOContract.bind(event.address)
   if (theseus == null) {
     theseus = new TheseusDAO(id)
     theseus.currentId = BigInt.fromI32(0)
-    let conract = TheseusDAOContract.bind(event.address)
     theseus.maxVotingPower = conract.maxVotingPower()
     theseus.votesNeededPercentage = conract.votesNeededPercentage()
     theseus.minVotingPower = conract.minVotingPower()
@@ -74,6 +74,13 @@ export function handleProposalMade(event: ProposalMadeEvent): void {
     theseus.insuranceFund = BigInt.fromI32(0)
     theseus.poolToken = event.address
     theseus.loanPoolTheseus = event.address
+  }
+  
+  if(theseus.insuranceFundMin == BigInt.fromI32(0)){
+    theseus.insuranceFundMin = conract.insuranceFundMin()
+  }
+  if(theseus.maxVotingPower == BigInt.fromI32(0)){
+    theseus.maxVotingPower = conract.maxVotingPower()
   }
   let proposeId = event.params.nonce
   let proposal = new Proposal(event.address.toHexString().concat('-').concat(proposeId.toString()))

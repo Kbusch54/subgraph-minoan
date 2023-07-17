@@ -132,12 +132,13 @@ export function handleClosePosition(event: ClosePositionEvent): void {
       let poolBalance = PoolBalance.load(trade.ammPool)
       if(poolBalance){
         let availablePool = poolBalance.availableUsdc
+        let totalPool = poolBalance.totalUsdcSupply
         let newPoolTotal = exhcnageContract.poolTotalUsdcSupply(Address.fromBytes(trade.ammPool))
         poolBalance.totalUsdcSupply = newPoolTotal
         let newPoolAvail = exhcnageContract.poolAvailableUsdc(Address.fromBytes(trade.ammPool))
         poolBalance.availableUsdc = newPoolAvail
         poolBalance.save()
-        let diffAvail = availablePool.minus(newPoolAvail)
+        let diffAvail = totalPool.minus(newPoolTotal)
         let poolPnl = new PoolPnl(trade.ammPool.toHexString().concat('_').concat(event.block.timestamp.toString()))
           if(poolPnl){
             poolPnl.loanPool = trade.ammPool
@@ -191,6 +192,7 @@ export function handleFfrAdjust(event: FfrAdjustEvent): void {
     let trade = Trade.load(tradeBalance.tradeId)
     if(trade){
       trade.ffrPayed = trade.ffrPayed.plus(event.params.amount)
+      trade.save()
       let amm = trade.ammPool
       let poolBalance = PoolBalance.load(amm)
       if(poolBalance){
@@ -312,7 +314,6 @@ export function handleOpenPosition(event: OpenPositionEvent): void {
         tradeBalance.interestRate = interestRate
         let balance = Balance.load(trade.user)
         if(balance ){
-          //loan * tradingFee / 10**6
           const feeToPay = event.params.loanAmt.times(tradingFee).div(BigInt.fromI32(10).pow(6))
           balance.availableUsdc = balance.availableUsdc.minus(feeToPay)
           trade.startingCost = event.params.collateral.plus(feeToPay)
@@ -321,16 +322,21 @@ export function handleOpenPosition(event: OpenPositionEvent): void {
           balance.totalCollateralUsdc = event.params.collateral
           let poolBal = PoolBalance.load(trade.ammPool)
           if(poolBal !== null){
-            log.warning('poolPnl {}', [feeToPay.toString()])
             let poolPnl = new PoolPnl(trade.ammPool.toHexString().concat('_').concat(event.block.timestamp.toString()))
             poolPnl.loanPool = trade.ammPool
             poolPnl.timeStamp = event.block.timestamp
-            poolPnl.amount = feeToPay
+            poolPnl.amount = feeToPay.div(BigInt.fromI32(2))
             poolPnl.save()
-            poolBal.availableUsdc = poolBal.availableUsdc.plus(feeToPay)
-            poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.plus(feeToPay)
+            poolBal.availableUsdc = poolBal.availableUsdc.plus(feeToPay.div(BigInt.fromI32(2)))
+            poolBal.totalUsdcSupply = poolBal.totalUsdcSupply.plus(feeToPay.div(BigInt.fromI32(2)))
             poolBal.save()
           }
+          let theseus = TheseusDAO.load(Bytes.fromHexString(theseusAdd))
+          if(theseus){
+            theseus.insuranceFund = theseus.insuranceFund.plus(feeToPay.div(BigInt.fromI32(2)))
+            theseus.save()
+          }
+
           balance.save()
         }
         let tradeOpen = TradeOpenValues.load(tradeId)
@@ -493,3 +499,5 @@ export function handleWithdraw(event: WithdrawEvent): void {
   }
 
 }
+
+
